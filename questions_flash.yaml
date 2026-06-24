@@ -1,0 +1,192 @@
+---
+# IstadAi — Audit Flash Maturité IA
+# 10 questions situationnelles (8 axes + 2 transverses)
+# Format : champ texte libre optionnel (non scoré) + auto-évaluation 5 ancres
+# Échelle CMMI : 1 Initial / 2 Aware / 3 Defined / 4 Managed / 5 Optimized
+# Compatible avec framework_axes.yaml (agent-audit-maturite)
+
+version: "1.0.0"
+
+# ============================================================
+# Couleurs niveaux (alignées avec agent-audit-maturite)
+# ============================================================
+level_colors:
+  1: "#D32F2F"
+  2: "#F57C00"
+  3: "#FBC02D"
+  4: "#7CB342"
+  5: "#388E3C"
+
+level_names:
+  1: "Initial"
+  2: "Aware"
+  3: "Defined"
+  4: "Managed"
+  5: "Optimized"
+
+level_descriptions:
+  1: "L'IA reste une intention diffuse, sans cadre ni pilotage."
+  2: "Conscience, premiers pilotes, gouvernance émergente."
+  3: "Pratiques formalisées, premiers cas en production, périmètres définis."
+  4: "Pilotage par KPI, scaling actif, gouvernance opérationnelle."
+  5: "IA intégrée à la stratégie et aux opérations, mesure d'impact systématique."
+
+# ============================================================
+# Roles for Q10 (non scorée — contextualisation)
+# ============================================================
+roles:
+  - "DG / Président"
+  - "DAF / Directeur Financier"
+  - "DSI / CTO / CDO"
+  - "CAIO / Chief AI Officer"
+  - "Directeur Métier"
+  - "Autre"
+
+# ============================================================
+# Les 10 questions
+# ============================================================
+questions:
+  - id: q1
+    axis_code: V
+    axis_name: "Vision & Alignement stratégique"
+    text_prompt: "En une phrase, décrivez la vision IA de votre entreprise."
+    eval_prompt: "Évaluez son degré de formalisation, de partage et d'alignement business."
+    anchors:
+      1: "Pas de vision IA explicite."
+      2: "Quelques convictions personnelles du DG, rien d'écrit."
+      3: "Vision rédigée mais peu diffusée au-delà du COMEX."
+      4: "Vision partagée au COMEX, alignée avec la stratégie business, communiquée aux équipes."
+      5: "Vision partagée à tous les niveaux, pilotée par KPIs, revue chaque année."
+
+  - id: q2
+    axis_code: P
+    axis_name: "Portefeuille de cas d'usage"
+    text_prompt: "Citez 2 cas d'usage IA dans lesquels vous investissez aujourd'hui."
+    eval_prompt: "Évaluez votre processus de priorisation des cas d'usage."
+    anchors:
+      1: "Cas d'usage opportunistes, aucune sélection structurée."
+      2: "Quelques POC isolés, choix intuitif."
+      3: "Portefeuille listé mais critères de priorisation flous."
+      4: "Portefeuille priorisé selon valeur / faisabilité / risque."
+      5: "Portefeuille piloté trimestriellement avec KPI ROI et taux de mise en prod."
+
+  - id: q3
+    axis_code: D
+    axis_name: "Données & Technologie"
+    text_prompt: "Décrivez l'état actuel de votre socle data (qualité, accessibilité, gouvernance)."
+    eval_prompt: "Évaluez le niveau de maturité de votre socle data."
+    anchors:
+      1: "Données dispersées, qualité non maîtrisée."
+      2: "Data lake ou DWH mais qualité hétérogène."
+      3: "Socle data structuré, gouvernance émergente."
+      4: "Socle data fiable, gouvernance opérationnelle, accès self-service partiel."
+      5: "Data products gouvernés, mesh ou platform, observabilité bout-en-bout."
+
+  - id: q4
+    axis_code: O
+    axis_name: "Organisation & Change"
+    text_prompt: "Qui pilote l'IA dans votre organisation ? (rôle, instance)"
+    eval_prompt: "Évaluez le niveau de structuration organisationnelle."
+    anchors:
+      1: "Aucun rôle dédié, l'IA est un sujet diffus."
+      2: "Un référent informel (souvent côté DSI)."
+      3: "Comité IA mensuel, rôles flous au-delà du COMEX."
+      4: "Modèle opératoire défini (centre d'excellence, champions métier, gouvernance écrite)."
+      5: "Organisation IA dimensionnée, RACI clair, change management piloté."
+
+  - id: q5
+    axis_code: T
+    axis_name: "Talent & Compétences"
+    text_prompt: "Décrivez votre dispositif de formation IA (qui, quoi, quand)."
+    eval_prompt: "Évaluez la maturité des compétences IA dans l'organisation."
+    anchors:
+      1: "Aucun plan de formation IA."
+      2: "Quelques formations ponctuelles, pas de plan."
+      3: "Acculturation COMEX faite, équipes métier inégales."
+      4: "Plan de formation par niveau, experts internes en place."
+      5: "Filière IA structurée, formation continue, mobilité interne organisée."
+
+  - id: q6
+    axis_code: A
+    axis_name: "Adoption & Scaling"
+    text_prompt: "Combien d'utilisateurs internes utilisent vraiment vos solutions IA aujourd'hui ?"
+    eval_prompt: "Évaluez le niveau d'adoption opérationnelle."
+    anchors:
+      1: "Aucune solution IA en production."
+      2: "1-2 POC isolés, peu utilisés."
+      3: "Quelques solutions en prod, adoption inégale."
+      4: "Plusieurs solutions adoptées, taux d'usage mesuré."
+      5: "IA intégrée aux process clés, scaling industriel, taux d'usage > 70%."
+
+  - id: q7
+    axis_code: M
+    axis_name: "Avantage compétitif & ROI"
+    text_prompt: "Citez un gain mesurable obtenu grâce à l'IA (chiffre, effet, indicateur)."
+    eval_prompt: "Évaluez la mesure de l'avantage compétitif IA."
+    anchors:
+      1: "Aucune mesure d'impact IA."
+      2: "Quelques anecdotes, pas de chiffres."
+      3: "Gains estimés au doigt mouillé."
+      4: "Indicateurs de gains documentés par cas d'usage."
+      5: "Avantage compétitif IA mesuré et publié (rapport annuel / COMEX)."
+
+  - id: q8
+    axis_code: G
+    axis_name: "Gouvernance & Risque IA"
+    text_prompt: "Quel dispositif avez-vous pour encadrer les risques IA (éthique, sécurité, conformité, IA Act) ?"
+    eval_prompt: "Évaluez la maturité de la gouvernance IA."
+    anchors:
+      1: "Aucun dispositif spécifique IA."
+      2: "Sujet identifié mais pas traité."
+      3: "Charte IA rédigée, application inégale."
+      4: "Comité éthique IA, processus d'évaluation des risques."
+      5: "Dispositif intégré (IA Act ready, audits réguliers, registre cas d'usage)."
+
+  - id: q9
+    axis_code: "TRANSVERSE-1"
+    axis_name: "Maturité globale réelle"
+    text_prompt: null
+    eval_prompt: "Combien de cas d'usage IA sont réellement en production aujourd'hui ?"
+    anchors:
+      1: "Aucun."
+      2: "1 ou 2 POC."
+      3: "3 à 5 cas d'usage en prod."
+      4: "6 à 15 cas d'usage en prod."
+      5: "Plus de 15 cas d'usage en prod, scaling continu."
+
+  # Q10 : contextualisation (non scorée, géré séparément dans app.py)
+
+# ============================================================
+# Texte de consentement (affiché avant de démarrer)
+# ============================================================
+consent_text: |
+  Cet audit flash est un pré-diagnostic gratuit proposé par **IstadAi**.
+
+  **Aucune IA n'intervient pendant l'audit.** Vos réponses au questionnaire
+  sont calculées selon notre **méthodologie cabinet propriétaire** — un
+  scoring déterministe et traçable, à scores identiques conclusions identiques.
+
+  À l'issue du questionnaire, vous serez invité(e) à indiquer vos **coordonnées
+  professionnelles** (nom, email, téléphone) pour accéder à votre synthèse et
+  permettre à IstadAi de vous recontacter. Ces données sont collectées par
+  IstadAi (responsable du traitement), conservées **12 mois maximum**, et
+  ne sont **jamais partagées avec un tiers**. Vous pouvez à tout moment
+  demander leur suppression par email à pierre-alain.laval@istada.fr.
+
+  L'IA intervient dans l'**audit complet** d'IstadAi (analyse d'entretiens
+  multi-sponsors, détection automatique des dissonances, narration des
+  livrables COMEX) — toujours opérée via **l'instance IA de votre
+  organisation** (architecture **BYOLLM**, *Bring Your Own LLM*) pour
+  garantir la sécurité, la souveraineté et la conformité de vos données.
+  IstadAi ne dispose à aucun moment de vos données qualitatives.
+
+  Le résultat affiché est indicatif et ne se substitue pas à un audit
+  complet, qui reste l'expression d'un avis professionnel motivé.
+
+# ============================================================
+# CTA final (vers commercial)
+# ============================================================
+cta:
+  contact_email: "pierre-alain.laval@istada.fr"
+  contact_label: "Discuter de ces résultats avec IstadAi"
+  audit_complete_label: "Demander un audit complet (interview multi-sponsors + cross-check budget)"
