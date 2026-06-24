@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 
 import plotly.graph_objects as go
 import streamlit as st
@@ -506,16 +507,37 @@ def render_results(config: dict) -> None:
     # ── CTA commercial ──
     cta = config["cta"]
     st.markdown("### 💬 Pour aller plus loin")
+
+    # On construit le mailto en encodant proprement subject et body via
+    # urllib.parse.quote, puis on l'injecte en HTML pour eviter que le
+    # parseur markdown de Streamlit s'embrouille sur les caracteres speciaux
+    # de l'URL (parentheses, accents, %, etc.).
+    mail_subject = f"Suite Audit Flash Maturite IA - {result.organization}"
+    mail_body = (
+        f"Bonjour,\n\n"
+        f"J'ai realise l'audit flash IstadAi pour {result.organization} "
+        f"(score {result.global_score:.2f}/5, niveau {result.level}).\n"
+        f"Je souhaiterais echanger a propos des suites possibles.\n\n"
+        f"Cordialement"
+    )
+    mailto_url = (
+        f"mailto:{cta['contact_email']}"
+        f"?subject={quote(mail_subject)}"
+        f"&body={quote(mail_body)}"
+    )
+
     st.markdown(
         f"""
-        Cet audit flash est indicatif. Pour un **audit complet** avec
-        entretiens multi-sponsors, cross-check budget IT et plan de transformation
-        actionnable :
+Cet audit flash est indicatif. Pour un **audit complet** avec entretiens
+multi-sponsors, cross-check budget IT et plan de transformation actionnable :
 
-        📧 **[{cta['contact_email']}]({'mailto:' + cta['contact_email']}?subject=Suite%20Audit%20Flash%20Maturit%C3%A9%20IA%20-%20{result.organization}&body=Bonjour,%0A%0AJ'ai%20r%C3%A9alis%C3%A9%20l'audit%20flash%20IstadAi%20pour%20{result.organization}%20(score%20{result.global_score:.2f}/5,%20niveau%20{result.level}).%20Je%20souhaiterais%20échanger%20à%20propos%20des%20suites%20possibles.%0A%0ACordialement)**
+<p style="margin: 1rem 0;">
+    📧 <a href="{mailto_url}" style="font-weight: 600; color: #1F365A; text-decoration: none;">{cta['contact_email']}</a>
+</p>
 
-        - Pierre-Alain Laval, IstadAi
-        """
+Pierre-Alain Laval, IstadAi
+        """,
+        unsafe_allow_html=True,
     )
 
     st.divider()
