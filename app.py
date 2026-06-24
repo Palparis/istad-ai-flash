@@ -76,6 +76,32 @@ def reset_session():
         del st.session_state[key]
 
 
+def _scroll_to_top() -> None:
+    """Force le scroll en haut de page après un st.rerun().
+
+    Streamlit conserve par défaut la position de scroll entre les reruns,
+    ce qui donne une UX cassée quand on passe d'une vue courte (intro)
+    à une vue longue (questionnaire). Ce hack injecte un petit script JS
+    qui scrolle au top dès que le composant est monté.
+    """
+    import streamlit.components.v1 as components
+    components.html(
+        """
+        <script>
+            setTimeout(function() {
+                const doc = window.parent.document;
+                const main = doc.querySelector('section.main')
+                          || doc.querySelector('div.main')
+                          || doc.querySelector('.stApp');
+                if (main) main.scrollTo({top: 0, behavior: 'instant'});
+                window.parent.scrollTo({top: 0, behavior: 'instant'});
+            }, 50);
+        </script>
+        """,
+        height=0,
+    )
+
+
 # ============================================================
 # Vue 1 — Consentement + identification organisation
 # ============================================================
@@ -141,6 +167,7 @@ def render_intro(config: dict) -> None:
 # ============================================================
 
 def render_questionnaire(config: dict) -> None:
+    _scroll_to_top()
     st.title("🎯 Audit Flash Maturité IA")
     st.caption(
         f"Organisation : **{st.session_state['organization']}**  ·  "
@@ -228,6 +255,7 @@ def render_email_gate(config: dict) -> None:
     Capture nom + email + téléphone, envoie la notification mail à IstadAi
     avec le PDF en pièce jointe, puis débloque l'accès aux résultats.
     """
+    _scroll_to_top()
     result = st.session_state["result"]
 
     st.title("🎯 Votre audit est terminé")
@@ -381,6 +409,7 @@ def render_radar_plotly(result) -> None:
 
 
 def render_results(config: dict) -> None:
+    _scroll_to_top()
     result = st.session_state["result"]
 
     st.title("🎯 Vos résultats")
