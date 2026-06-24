@@ -531,8 +531,11 @@ def render_results(config: dict) -> None:
 Cet audit flash est indicatif. Pour un **audit complet** avec entretiens
 multi-sponsors, cross-check budget IT et plan de transformation actionnable :
 
-<p style="margin: 1rem 0;">
+<p style="margin: 1rem 0 0.3rem 0;">
     📧 <a href="{mailto_url}" style="font-weight: 600; color: #1F365A; text-decoration: none;">{cta['contact_email']}</a>
+</p>
+<p style="margin: 0 0 1rem 0;">
+    📞 <a href="tel:+33689394880" style="font-weight: 600; color: #1F365A; text-decoration: none;">+33 6 89 39 48 80</a>
 </p>
 
 Pierre-Alain Laval, IstadAi
