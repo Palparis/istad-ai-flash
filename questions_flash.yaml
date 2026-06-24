@@ -1,5 +1,5 @@
 ---
-# IstadAi — Audit Flash Maturité IA
+# IstadAi - Audit Flash Maturité IA
 # 10 questions situationnelles (8 axes + 2 transverses)
 # Format : champ texte libre optionnel (non scoré) + auto-évaluation 5 ancres
 # Échelle CMMI : 1 Initial / 2 Aware / 3 Defined / 4 Managed / 5 Optimized
@@ -32,7 +32,7 @@ level_descriptions:
   5: "IA intégrée à la stratégie et aux opérations, mesure d'impact systématique."
 
 # ============================================================
-# Roles for Q10 (non scorée — contextualisation)
+# Roles for Q10 (non scorée - contextualisation)
 # ============================================================
 roles:
   - "DG / Président"
@@ -163,7 +163,7 @@ consent_text: |
   Cet audit flash est un pré-diagnostic gratuit proposé par **IstadAi**.
 
   **Aucune IA n'intervient pendant l'audit.** Vos réponses au questionnaire
-  sont calculées selon notre **méthodologie cabinet propriétaire** — un
+  sont calculées selon notre **méthodologie cabinet propriétaire** - un
   scoring déterministe et traçable, à scores identiques conclusions identiques.
 
   À l'issue du questionnaire, vous serez invité(e) à indiquer vos **coordonnées
@@ -175,7 +175,7 @@ consent_text: |
 
   L'IA intervient dans l'**audit complet** d'IstadAi (analyse d'entretiens
   multi-sponsors, détection automatique des dissonances, narration des
-  livrables COMEX) — toujours opérée via **l'instance IA de votre
+  livrables COMEX) - toujours opérée via **l'instance IA de votre
   organisation** (architecture **BYOLLM**, *Bring Your Own LLM*) pour
   garantir la sécurité, la souveraineté et la conformité de vos données.
   IstadAi ne dispose à aucun moment de vos données qualitatives.

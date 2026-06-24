@@ -1,11 +1,11 @@
-"""IstadAi — Scoring déterministe pour l'audit flash.
+"""IstadAi - Scoring déterministe pour l'audit flash.
 
 100% Python, zéro LLM. Calcule à partir des 9 ancres (8 axes + 1 transverse).
 
 Logique :
-- Score axe = ancre choisie (1-5) — simple, lisible, alignée CMMI
+- Score axe = ancre choisie (1-5) - simple, lisible, alignée CMMI
 - Score global = moyenne arithmétique des 8 scores d'axe
-  (la question transverse Q9 ne rentre PAS dans la moyenne — c'est un check de cohérence)
+  (la question transverse Q9 ne rentre PAS dans la moyenne - c'est un check de cohérence)
 - Niveau global = round(score_global), clampé entre 1 et 5
 - Forces = axes ≥ 4
 - Zones de progrès = axes ≤ 2, triés par valeur croissante

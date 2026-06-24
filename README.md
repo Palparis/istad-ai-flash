@@ -1,4 +1,4 @@
-# IstadAi — Audit Flash Maturité IA
+# IstadAi - Audit Flash Maturité IA
 
 Pré-diagnostic gratuit en 10 questions, 5-10 minutes. Pas de LLM, pas de
 capture lead, scoring 100% déterministe. Lien partageable pour test marché.
@@ -91,7 +91,7 @@ L'app se lance sur `http://localhost:8501`.
 
 ## Cohérence avec l'agent #2 (audit complet)
 
-- Mêmes axes (V/P/D/O/T/A/M/G) — même framework propriétaire IstadAi
+- Mêmes axes (V/P/D/O/T/A/M/G) - même framework propriétaire IstadAi
 - Mêmes ancres CMMI (1 Initial → 5 Optimized)
 - Mêmes couleurs niveau (rouge → vert)
 - Même style PDF (typographie, footer paginé)

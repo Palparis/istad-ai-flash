@@ -1,4 +1,4 @@
-"""IstadAi — Notification email du lead à chaque audit flash complété.
+"""IstadAi - Notification email du lead à chaque audit flash complété.
 
 Envoie à pierre-alain.laval@istada.fr un mail récapitulatif avec :
 - L'identité du lead (nom, email, téléphone)
@@ -17,7 +17,7 @@ Configuration via variables d'environnement (.env ou Streamlit secrets) :
     LEAD_NOTIFICATION_TO = pierre-alain.laval@istada.fr
 
 Si SMTP_USER ou SMTP_PASSWORD ne sont pas définis, l'envoi est skippé
-silencieusement (mode dev local) — un warning apparaît dans les logs.
+silencieusement (mode dev local) - un warning apparaît dans les logs.
 """
 
 from __future__ import annotations
@@ -90,10 +90,10 @@ def send_lead_notification(
         smtp_password = "".join(smtp_password.split())
 
     # En l'absence de credentials, on log mais on n'échoue pas
-    # (mode dev — permet de tester sans configurer SMTP)
+    # (mode dev - permet de tester sans configurer SMTP)
     if not smtp_user or not smtp_password:
         logger.warning(
-            "SMTP non configuré — notification skippée. Lead : %s %s (%s, %s) — %s",
+            "SMTP non configuré - notification skippée. Lead : %s %s (%s, %s) - %s",
             lead_first_name, lead_last_name, lead_email, lead_phone,
             result.organization,
         )
@@ -102,7 +102,7 @@ def send_lead_notification(
     # ── Construction du mail ──
     msg = MIMEMultipart()
     msg["Subject"] = (
-        f"🎯 Nouveau lead Audit Flash IstadAi — "
+        f"🎯 Nouveau lead Audit Flash IstadAi - "
         f"{lead_first_name} {lead_last_name} ({result.organization})"
     )
     msg["From"] = smtp_user
@@ -134,7 +134,7 @@ def send_lead_notification(
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
         logger.info(
-            "Notification lead envoyée : %s %s <%s> — %s (score %.2f/5)",
+            "Notification lead envoyée : %s %s <%s> - %s (score %.2f/5)",
             lead_first_name, lead_last_name, lead_email,
             result.organization, result.global_score,
         )
@@ -161,21 +161,21 @@ def _build_lead_email_html(
     # Forces
     if result.strengths:
         strengths_html = "".join(
-            f"<li><b>{code}</b> — {name} ({score}/5)</li>"
+            f"<li><b>{code}</b> - {name} ({score}/5)</li>"
             for code, name, score in result.strengths
         )
     else:
-        strengths_html = "<li><em>Aucune force marquée — terrain d'opportunité large.</em></li>"
+        strengths_html = "<li><em>Aucune force marquée - terrain d'opportunité large.</em></li>"
 
     # Zones de progrès
     gaps_html = "".join(
-        f"<li><b>{code}</b> — {name} ({score}/5)</li>"
+        f"<li><b>{code}</b> - {name} ({score}/5)</li>"
         for code, name, score in result.gaps
     )
 
     # Tous les scores axe par axe
     axis_scores_html = "".join(
-        f"<tr><td><b>{code}</b> — {result.axis_names[code]}</td>"
+        f"<tr><td><b>{code}</b> - {result.axis_names[code]}</td>"
         f"<td style='text-align: right;'>{score} / 5</td></tr>"
         for code, score in result.axis_scores.items()
     )
@@ -183,7 +183,7 @@ def _build_lead_email_html(
     # Verbatims
     if result.text_inputs:
         verbatims_html = "".join(
-            f"<p style='margin: 8px 0;'><b>{code} — {result.axis_names[code]}</b><br>"
+            f"<p style='margin: 8px 0;'><b>{code} - {result.axis_names[code]}</b><br>"
             f"<em>« {quote} »</em></p>"
             for code, quote in result.text_inputs.items()
         )
@@ -198,7 +198,7 @@ def _build_lead_email_html(
                     margin: 12px 0;">
             <b>⚠️ Dissonance déclaratif / réel :</b><br>
             Maturité déclarée <b>{result.global_score:.2f}/5</b> vs maturité réelle
-            (cas d'usage en prod) <b>{result.q9_real_score}/5</b> — écart de
+            (cas d'usage en prod) <b>{result.q9_real_score}/5</b> - écart de
             <b>{result.dissonance_declaratif_vs_reel:.1f} point</b>. Signal classique
             d'organisation en phase d'ambition à challenger en restitution.
         </div>
@@ -238,7 +238,7 @@ def _build_lead_email_html(
     <p style="font-size: 18px; margin: 8px 0;">
         <b>{result.global_score:.2f} / 5</b> &nbsp;·&nbsp;
         <span style="color: {result.level_color};">●</span>
-        <b>Niveau {result.level} — {result.level_name}</b>
+        <b>Niveau {result.level} - {result.level_name}</b>
     </p>
     <p style="color: #666; font-style: italic; margin-top: 0;">
         « {result.level_description} »

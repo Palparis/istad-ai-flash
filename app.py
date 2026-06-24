@@ -1,8 +1,8 @@
-"""IstadAi — Audit Flash Maturité IA (v0 lean)
+"""IstadAi - Audit Flash Maturité IA (v0 lean)
 ================================================
 
 App Streamlit autonome : 10 questions, scoring déterministe, PDF synthèse.
-Lien partageable pour test marché — pas de landing, pas de capture lead,
+Lien partageable pour test marché - pas de landing, pas de capture lead,
 pas de LLM dans la boucle.
 
 Lancer en local :
@@ -10,7 +10,7 @@ Lancer en local :
     streamlit run app.py
 
 Déployer sur Streamlit Cloud :
-    1. Push le repo IstadAi sur GitHub (déjà fait — privé)
+    1. Push le repo IstadAi sur GitHub (déjà fait - privé)
     2. Aller sur https://share.streamlit.io et connecter le repo
     3. Path : istad-ai/agent-audit-flash/app.py
     4. Récupérer l'URL : https://istad-ai-flash.streamlit.app/
@@ -38,7 +38,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 # ============================================================
 
 st.set_page_config(
-    page_title="IstadAi — Audit Flash Maturité IA",
+    page_title="IstadAi - Audit Flash Maturité IA",
     page_icon="🎯",
     layout="centered",  # centré pour effet "tunnel"
     initial_sidebar_state="collapsed",
@@ -103,14 +103,14 @@ def _scroll_to_top() -> None:
 
 
 # ============================================================
-# Vue 1 — Consentement + identification organisation
+# Vue 1 - Consentement + identification organisation
 # ============================================================
 
 def render_intro(config: dict) -> None:
     st.title("🎯 Audit Flash Maturité IA")
     st.markdown(
-        '<div class="istad-tagline">Un pré-diagnostic en 10 questions — '
-        "5 à 10 minutes — proposé par IstadAi.</div>",
+        '<div class="istad-tagline">Un pré-diagnostic en 10 questions - '
+        "5 à 10 minutes - proposé par IstadAi.</div>",
         unsafe_allow_html=True,
     )
 
@@ -136,7 +136,7 @@ def render_intro(config: dict) -> None:
             "Votre rôle",
             options=config["roles"],
             index=0,
-            help="Sert uniquement à contextualiser votre rapport — non scoré.",
+            help="Sert uniquement à contextualiser votre rapport - non scoré.",
         )
         consent = st.checkbox(
             "Je comprends que cet audit est gratuit, qu'il restitue un scoring "
@@ -163,7 +163,7 @@ def render_intro(config: dict) -> None:
 
 
 # ============================================================
-# Vue 2 — Le questionnaire (toutes les questions sur une page)
+# Vue 2 - Le questionnaire (toutes les questions sur une page)
 # ============================================================
 
 def render_questionnaire(config: dict) -> None:
@@ -177,7 +177,7 @@ def render_questionnaire(config: dict) -> None:
 
     st.markdown(
         "Pour chaque axe, vous pouvez :\n"
-        "- Décrire votre situation actuelle en une phrase (optionnel — apparaîtra "
+        "- Décrire votre situation actuelle en une phrase (optionnel - apparaîtra "
         "dans votre rapport)\n"
         "- Indiquer où vous placez votre organisation sur l'échelle 1-5 (obligatoire)"
     )
@@ -190,7 +190,7 @@ def render_questionnaire(config: dict) -> None:
         for i, q in enumerate(questions, 1):
             qid = q["id"]
             st.markdown(
-                f"### {i}. {q['axis_code']} — {q['axis_name']}"
+                f"### {i}. {q['axis_code']} - {q['axis_name']}"
                 if not q["axis_code"].startswith("TRANSVERSE")
                 else f"### {i}. {q['axis_name']} *(transverse)*"
             )
@@ -200,14 +200,14 @@ def render_questionnaire(config: dict) -> None:
                 txt = st.text_input(
                     q["text_prompt"],
                     key=f"{qid}_text",
-                    placeholder="Optionnel — apparaîtra dans votre rapport",
+                    placeholder="Optionnel - apparaîtra dans votre rapport",
                     max_chars=200,
                 )
                 answers[f"{qid}_text"] = txt or ""
 
             # Auto-évaluation 5 ancres
             anchor_labels = [
-                f"{level} — {q['anchors'][level]}"
+                f"{level} - {q['anchors'][level]}"
                 for level in sorted(q["anchors"].keys())
             ]
             choice = st.radio(
@@ -218,7 +218,7 @@ def render_questionnaire(config: dict) -> None:
             )
             if choice is not None:
                 # Extraire le numéro (premier caractère)
-                answers[qid] = int(choice.split(" — ", 1)[0])
+                answers[qid] = int(choice.split(" - ", 1)[0])
 
             st.markdown("---")
 
@@ -246,7 +246,7 @@ def render_questionnaire(config: dict) -> None:
 
 
 # ============================================================
-# Vue intermédiaire — Gate email
+# Vue intermédiaire - Gate email
 # ============================================================
 
 def render_email_gate(config: dict) -> None:
@@ -359,19 +359,19 @@ def render_email_gate(config: dict) -> None:
 
         # Stocker en session pour passer à la vue résultats
         # NB : on n'écrit PAS sur 'lead_first_name' etc. car ce sont déjà des
-        # clés de widget — Streamlit refuse les double-affectations.
+        # clés de widget - Streamlit refuse les double-affectations.
         st.session_state["lead_captured"] = True
         st.session_state["lead_pdf_bytes"] = pdf_bytes
         st.rerun()
 
 
 # ============================================================
-# Vue 3 — Résultats
+# Vue 3 - Résultats
 # ============================================================
 
 def render_radar_plotly(result) -> None:
     codes = list(result.axis_scores.keys())
-    labels = [f"{c} — {result.axis_names[c][:25]}" for c in codes]
+    labels = [f"{c} - {result.axis_names[c][:25]}" for c in codes]
     values = [result.axis_scores[c] for c in codes]
 
     labels_closed = labels + [labels[0]]
@@ -430,7 +430,7 @@ def render_results(config: dict) -> None:
                 <div style="font-size: 0.875rem; color: #6b6b6b;">Niveau de maturité</div>
                 <div style="font-size: 1.5rem; font-weight: 600;">
                     <span style="color: {result.level_color};">●</span>
-                    {result.level} — {result.level_name}
+                    {result.level} - {result.level_name}
                 </div>
                 <div style="font-size: 0.9rem; font-style: italic; color: #1a1a1a;">
                     « {result.level_description} »
@@ -464,15 +464,15 @@ def render_results(config: dict) -> None:
         st.markdown("### ✅ Vos forces")
         if result.strengths:
             for code, name, score in result.strengths:
-                st.success(f"**{code}** — {name} ({score}/5)")
+                st.success(f"**{code}** - {name} ({score}/5)")
         else:
             st.info(
-                "Aucun axe ne ressort en force marquée — terrain d'opportunité large."
+                "Aucun axe ne ressort en force marquée - terrain d'opportunité large."
             )
     with c2:
         st.markdown("### 🎯 Zones de progrès prioritaires")
         for code, name, score in result.gaps:
-            st.error(f"**{code}** — {name} ({score}/5)")
+            st.error(f"**{code}** - {name} ({score}/5)")
 
     st.divider()
 
@@ -514,7 +514,7 @@ def render_results(config: dict) -> None:
 
         📧 **[{cta['contact_email']}]({'mailto:' + cta['contact_email']}?subject=Suite%20Audit%20Flash%20Maturit%C3%A9%20IA%20-%20{result.organization}&body=Bonjour,%0A%0AJ'ai%20r%C3%A9alis%C3%A9%20l'audit%20flash%20IstadAi%20pour%20{result.organization}%20(score%20{result.global_score:.2f}/5,%20niveau%20{result.level}).%20Je%20souhaiterais%20échanger%20à%20propos%20des%20suites%20possibles.%0A%0ACordialement)**
 
-        — Pierre-Alain Laval, IstadAi
+        - Pierre-Alain Laval, IstadAi
         """
     )
 

@@ -1,7 +1,7 @@
-"""IstadAi — Génération du PDF de synthèse de l'audit flash.
+"""IstadAi - Génération du PDF de synthèse de l'audit flash.
 
 1 page A4, sans LLM. Contient :
-- En-tête : IstadAi — Audit Flash Maturité IA, organisation, date
+- En-tête : IstadAi - Audit Flash Maturité IA, organisation, date
 - Score global + niveau
 - Mini-radar 8 axes (matplotlib, carré strict)
 - Vue forces / zones de progrès
@@ -65,7 +65,7 @@ def _format_date_fr(d) -> str:
 def _render_radar_png(result: FlashResult) -> bytes:
     """Génère le radar 8 axes au format PNG."""
     codes = list(result.axis_scores.keys())
-    labels = [f"{c} — {result.axis_names[c][:18]}" for c in codes]
+    labels = [f"{c} - {result.axis_names[c][:18]}" for c in codes]
     values = [result.axis_scores[c] for c in codes]
 
     n = len(codes)
@@ -90,7 +90,7 @@ def _render_radar_png(result: FlashResult) -> bytes:
     ax.grid(color="#cccccc", linewidth=0.5)
     ax.spines["polar"].set_color("#999999")
 
-    ax.set_title("Radar 8 axes — Score / 5", fontsize=9, color="#1F365A", pad=14)
+    ax.set_title("Radar 8 axes - Score / 5", fontsize=9, color="#1F365A", pad=14)
 
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=150, facecolor="white")
@@ -106,7 +106,7 @@ def _render_radar_png(result: FlashResult) -> bytes:
 class _NumberedCanvas(Canvas):
     """Canvas avec footer paginé 'Page X / Y'."""
 
-    _footer_doc_name: str = "IstadAi — Audit Flash Maturité IA"
+    _footer_doc_name: str = "IstadAi - Audit Flash Maturité IA"
     _footer_mission: str = ""
     _footer_date: str = ""
 
@@ -215,7 +215,7 @@ def _build_header_table(result: FlashResult, styles: dict) -> Table:
         Paragraph("Niveau de maturité", styles["ScoreLabel"]),
         Paragraph(
             f'<font color="{result.level_color}">●</font> '
-            f"{result.level} — {result.level_name}",
+            f"{result.level} - {result.level_name}",
             styles["LevelBig"],
         ),
         Paragraph(
@@ -243,19 +243,19 @@ def _build_strengths_gaps_table(result: FlashResult, styles: dict) -> Table:
     if result.strengths:
         for code, name, score in result.strengths:
             strengths_block.append(Paragraph(
-                f"✓ <b>{code}</b> — {name} ({score}/5)",
+                f"✓ <b>{code}</b> - {name} ({score}/5)",
                 styles["Strength"],
             ))
     else:
         strengths_block.append(Paragraph(
-            "Aucun axe ne ressort en force marquée — terrain d'opportunité.",
+            "Aucun axe ne ressort en force marquée - terrain d'opportunité.",
             styles["Body"],
         ))
 
     gaps_block = [Paragraph("<b>Zones de progrès prioritaires</b>", styles["Section"])]
     for code, name, score in result.gaps:
         gaps_block.append(Paragraph(
-            f"▸ <b>{code}</b> — {name} ({score}/5)",
+            f"▸ <b>{code}</b> - {name} ({score}/5)",
             styles["Gap"],
         ))
 
@@ -296,7 +296,7 @@ def generate_flash_pdf(result: FlashResult) -> bytes:
 
     # ── En-tête ──
     story.append(Paragraph(
-        "IstadAi — Audit Flash Maturité IA", styles["Title"]
+        "IstadAi - Audit Flash Maturité IA", styles["Title"]
     ))
     story.append(Paragraph(
         f"Organisation : <b>{result.organization}</b> &nbsp;&nbsp;|&nbsp;&nbsp; "
@@ -347,14 +347,14 @@ def generate_flash_pdf(result: FlashResult) -> bytes:
     # ── Phrases libres ──
     if result.text_inputs:
         story.append(Paragraph(
-            "VOS APPORTS QUALITATIFS — VERBATIMS", styles["Section"]
+            "VOS APPORTS QUALITATIFS - VERBATIMS", styles["Section"]
         ))
         for code in result.axis_scores:
             if code in result.text_inputs:
                 name = result.axis_names[code]
                 quote = result.text_inputs[code]
                 story.append(Paragraph(
-                    f'<b>{code} — {name}</b> : <i>« {quote} »</i>',
+                    f'<b>{code} - {name}</b> : <i>« {quote} »</i>',
                     styles["Quote"],
                 ))
 
@@ -374,22 +374,22 @@ def generate_flash_pdf(result: FlashResult) -> bytes:
     # ── Footer méthodologique ──
     story.append(Spacer(1, 4))
     story.append(Paragraph(
-        "<b>Méthodologie IstadAi</b> — Audit flash construit sur le framework "
+        "<b>Méthodologie IstadAi</b> - Audit flash construit sur le framework "
         "propriétaire IstadAi Maturity Model (8 axes / 80 items / 480 ancres "
         "comportementales). Sources théoriques : Harvard AI for Leaders (M1-M4), "
         "Gartner AI Maturity Model, expérience cabinet terrain ETI. Scoring 100 % "
-        "déterministe et traçable — à scores identiques, conclusions identiques. "
+        "déterministe et traçable - à scores identiques, conclusions identiques. "
         "L'IA intervient dans l'<b>audit complet</b> d'IstadAi (extraction signaux "
         "entretiens, détection dissonances multi-sponsors, narration livrables "
         "COMEX), opérée via <b>l'instance IA de votre organisation</b> "
         "(architecture <b>BYOLLM</b>, <i>Bring Your Own LLM</i>) pour préserver "
         "la confidentialité, la souveraineté et la conformité de vos données. "
-        "Résultat indicatif — ne se substitue pas à un audit professionnel motivé.",
+        "Résultat indicatif - ne se substitue pas à un audit professionnel motivé.",
         styles["Footer"],
     ))
 
     # Injecter les métadonnées du footer paginé
-    _NumberedCanvas._footer_doc_name = "IstadAi — Audit Flash Maturité IA"
+    _NumberedCanvas._footer_doc_name = "IstadAi - Audit Flash Maturité IA"
     _NumberedCanvas._footer_mission = result.organization
     _NumberedCanvas._footer_date = date_str
 

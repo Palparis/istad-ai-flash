@@ -1,5 +1,5 @@
 #!/bin/bash
-# sync_to_public.sh — Synchronise agent-audit-flash/ vers le repo public istad-ai-flash
+# sync_to_public.sh - Synchronise agent-audit-flash/ vers le repo public istad-ai-flash
 #
 # Usage :
 #     ./sync_to_public.sh "message de commit"
@@ -23,7 +23,7 @@ echo "▸ Destination: $PUBLIC_DIR"
 # 1. Cloner le repo public si nécessaire
 if [ ! -d "$PUBLIC_DIR/.git" ]; then
     echo ""
-    echo "▸ Premier run — clonage de Palparis/istad-ai-flash dans $PUBLIC_DIR"
+    echo "▸ Premier run - clonage de Palparis/istad-ai-flash dans $PUBLIC_DIR"
     git clone https://github.com/Palparis/istad-ai-flash.git "$PUBLIC_DIR"
 fi
 
