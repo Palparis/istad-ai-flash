@@ -178,10 +178,22 @@ def render_questionnaire(config: dict) -> None:
 
     st.markdown(
         "Pour chaque axe, vous pouvez :\n"
-        "- Décrire votre situation actuelle en une phrase (optionnel - apparaîtra "
+        "- Décrire votre situation actuelle en une phrase (optionnel - apparaitra "
         "dans votre rapport)\n"
-        "- Indiquer où vous placez votre organisation sur l'échelle 1-5 (obligatoire)"
+        "- Indiquer ou vous placez votre organisation sur l'echelle 1-5 (obligatoire)"
     )
+
+    st.info(
+        "**Lecture des options proposees** : les 5 niveaux affiches sont des "
+        "reperes illustratifs qui correspondent aux situations les plus "
+        "frequemment observees en ETI. Si votre situation ne correspond a "
+        "aucune des descriptions exactement, choisissez celle qui s'en "
+        "rapproche le plus, ou notez selon votre propre lecture sur "
+        "l'echelle (1 = situation tres peu avancee ; 5 = situation tres "
+        "avancee, sous controle, mesuree). Vous pouvez nuancer dans le "
+        "champ texte libre situe au-dessus de chaque echelle."
+    )
+
     st.markdown("---")
 
     questions = config["questions"]
