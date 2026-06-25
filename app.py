@@ -568,7 +568,9 @@ def render_results(config: dict) -> None:
     st.markdown(
         f"""
 Cet audit flash est indicatif. Pour un **audit complet** avec entretiens
-multi-sponsors, cross-check budget IT et plan de transformation actionnable :
+multi-sponsors, **analyses augmentées par l'IA de votre organisation**
+(architecture BYOLLM), cross-check budget IT et plan de transformation
+actionnable :
 
 <p style="margin: 1rem 0 0.3rem 0;">
     📧 <a href="{mailto_url}" style="font-weight: 600; color: #1F365A; text-decoration: none;">{cta['contact_email']}</a>

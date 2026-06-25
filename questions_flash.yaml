@@ -173,12 +173,12 @@ consent_text: |
   ne sont **jamais partagées avec un tiers**. Vous pouvez à tout moment
   demander leur suppression par email à pierre-alain.laval@istada.fr.
 
-  L'IA intervient dans l'**audit complet** d'IstadAi (analyse d'entretiens
-  multi-sponsors, détection automatique des dissonances, narration des
-  livrables COMEX) - toujours opérée via **l'instance IA de votre
-  organisation** (architecture **BYOLLM**, *Bring Your Own LLM*) pour
-  garantir la sécurité, la souveraineté et la conformité de vos données.
-  IstadAi ne dispose à aucun moment de vos données qualitatives.
+  L'IA intervient dans l'**audit complet** d'IstadAi (entretiens multi-sponsors,
+  **analyses augmentées par l'IA de votre organisation**, détection automatique
+  des dissonances, narration des livrables COMEX) - toujours opérée via
+  **l'instance IA de votre organisation** (architecture **BYOLLM**, *Bring Your
+  Own LLM*) pour garantir la sécurité, la souveraineté et la conformité de vos
+  données. IstadAi ne dispose à aucun moment de vos données qualitatives.
 
   Le résultat affiché est indicatif et ne se substitue pas à un audit
   complet, qui reste l'expression d'un avis professionnel motivé.
@@ -189,4 +189,4 @@ consent_text: |
 cta:
   contact_email: "pierre-alain.laval@istada.fr"
   contact_label: "Discuter de ces résultats avec IstadAi"
-  audit_complete_label: "Demander un audit complet (interview multi-sponsors + cross-check budget)"
+  audit_complete_label: "Demander un audit complet (entretiens multi-sponsors + analyses augmentées par l'IA de votre organisation + cross-check budget)"

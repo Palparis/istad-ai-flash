@@ -372,8 +372,9 @@ def generate_flash_pdf(result: FlashResult) -> bytes:
     ))
     story.append(Paragraph(
         "Cet audit flash est un pré-diagnostic indicatif. Pour un audit complet "
-        "(entretiens multi-sponsors, cross-check budget IT, plan de transformation "
-        "actionnable), contactez IstadAi : "
+        "(entretiens multi-sponsors, analyses augmentées par l'IA de votre "
+        "organisation (architecture BYOLLM), cross-check budget IT, plan de "
+        "transformation actionnable), contactez IstadAi : "
         '<a href="mailto:pierre-alain.laval@istada.fr"><b>pierre-alain.laval@istada.fr</b></a>',
         styles["Body"],
     ))
