@@ -257,12 +257,12 @@ def _build_strengths_gaps_table(result: FlashResult, styles: dict) -> Table:
             )])
     else:
         rows.append([Paragraph(
-            "Aucun axe ne ressort en force marquee - terrain d'opportunite.",
+            "Aucun axe ne ressort en force marquée - terrain d'opportunité.",
             styles["Body"],
         )])
 
-    # Bloc Zones de progres
-    rows.append([Paragraph("<b>Zones de progres prioritaires</b>", styles["Section"])])
+    # Bloc Zones de progrès
+    rows.append([Paragraph("<b>Zones de progrès prioritaires</b>", styles["Section"])])
     for code, name, score in result.gaps:
         rows.append([Paragraph(
             f"&#9656; <b>{code}</b> - {name} ({score}/5)",

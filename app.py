@@ -178,20 +178,20 @@ def render_questionnaire(config: dict) -> None:
 
     st.markdown(
         "Pour chaque axe, vous pouvez :\n"
-        "- Décrire votre situation actuelle en une phrase (optionnel - apparaitra "
+        "- Décrire votre situation actuelle en une phrase (optionnel - apparaîtra "
         "dans votre rapport)\n"
-        "- Indiquer ou vous placez votre organisation sur l'echelle 1-5 (obligatoire)"
+        "- Indiquer où vous placez votre organisation sur l'échelle 1-5 (obligatoire)"
     )
 
     st.info(
-        "**Lecture des options proposees** : les 5 niveaux affiches sont des "
-        "reperes illustratifs qui correspondent aux situations les plus "
-        "frequemment observees en ETI. Si votre situation ne correspond a "
+        "**Lecture des options proposées** : les 5 niveaux affichés sont des "
+        "repères illustratifs qui correspondent aux situations les plus "
+        "fréquemment observées en ETI. Si votre situation ne correspond à "
         "aucune des descriptions exactement, choisissez celle qui s'en "
         "rapproche le plus, ou notez selon votre propre lecture sur "
-        "l'echelle (1 = situation tres peu avancee ; 5 = situation tres "
-        "avancee, sous controle, mesuree). Vous pouvez nuancer dans le "
-        "champ texte libre situe au-dessus de chaque echelle."
+        "l'échelle (1 = situation très peu avancée ; 5 = situation très "
+        "avancée, sous contrôle, mesurée). Vous pouvez nuancer dans le "
+        "champ texte libre situé au-dessus de chaque échelle."
     )
 
     st.markdown("---")
@@ -213,7 +213,7 @@ def render_questionnaire(config: dict) -> None:
                 txt = st.text_area(
                     q["text_prompt"],
                     key=f"{qid}_text",
-                    placeholder="Optionnel - apparaitra dans votre rapport et nourrira notre echange si vous souhaitez approfondir.",
+                    placeholder="Optionnel - apparaîtra dans votre rapport et nourrira notre échange si vous souhaitez approfondir.",
                     max_chars=200,
                     height=80,
                 )
@@ -454,23 +454,23 @@ def render_results(config: dict) -> None:
             unsafe_allow_html=True,
         )
 
-    # ── Encadre pedagogie 'Comment lire vos resultats' ──
-    with st.expander("ℹ️ Comment lire vos resultats", expanded=False):
+    # ── Encadré pédagogie 'Comment lire vos résultats' ──
+    with st.expander("ℹ️ Comment lire vos résultats", expanded=False):
         st.markdown(
             """
-**Niveau de maturite (echelle 1 a 5)** :
+**Niveau de maturité (échelle 1 à 5)** :
 
 - **1 - Initial** : l'IA reste une intention diffuse, sans cadre ni pilotage
-- **2 - Aware** : conscience, premiers pilotes, gouvernance emergente
-- **3 - Defined** : pratiques formalisees, premiers cas en production, perimetres definis
-- **4 - Managed** : pilotage par KPI, scaling actif, gouvernance operationnelle
-- **5 - Optimized** : IA integree a la strategie et aux operations, mesure d'impact systematique
+- **2 - Aware** : conscience, premiers pilotes, gouvernance émergente
+- **3 - Defined** : pratiques formalisées, premiers cas en production, périmètres définis
+- **4 - Managed** : pilotage par KPI, scaling actif, gouvernance opérationnelle
+- **5 - Optimized** : IA intégrée à la stratégie et aux opérations, mesure d'impact systématique
 
-**Forces** : axes ou vous avez score 4 ou 5 sur 5. Ce sont vos atouts sur lesquels capitaliser.
+**Forces** : axes où vous avez score 4 ou 5 sur 5. Ce sont vos atouts sur lesquels capitaliser.
 
-**Zones de progres prioritaires** : axes ou vous avez score 1 ou 2. Ce sont les leviers a activer en priorite. Une severite haute indique un poids fort dans le framework combine avec un score bas.
+**Zones de progrès prioritaires** : axes où vous avez score 1 ou 2. Ce sont les leviers à activer en priorité. Une sévérité haute indique un poids fort dans le framework combiné avec un score bas.
 
-**Repere de marche** : selon nos observations, la maturite IA moyenne des ETI françaises se situe entre niveau 2 et 3. Atteindre le niveau 4 demande generalement 18 a 36 mois de transformation structuree.
+**Repère de marché** : selon nos observations, la maturité IA moyenne des ETI françaises se situe entre niveau 2 et 3. Atteindre le niveau 4 demande généralement 18 à 36 mois de transformation structurée.
             """
         )
 
@@ -494,9 +494,9 @@ def render_results(config: dict) -> None:
 
     # ── Forces / Zones de progrès ──
     st.caption(
-        "Vos forces sont les axes scorant 4 ou 5 sur 5. Vos zones de progres sont "
+        "Vos forces sont les axes scorant 4 ou 5 sur 5. Vos zones de progrès sont "
         "les axes scorant 1 ou 2. Si aucun axe n'atteint ces seuils, le radar "
-        "vous donne quand meme une lecture relative de vos points d'appui et "
+        "vous donne quand même une lecture relative de vos points d'appui et "
         "de vos chantiers."
     )
     c1, c2 = st.columns(2)
