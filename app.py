@@ -198,11 +198,12 @@ def render_questionnaire(config: dict) -> None:
 
             # Champ texte libre (si défini)
             if q.get("text_prompt"):
-                txt = st.text_input(
+                txt = st.text_area(
                     q["text_prompt"],
                     key=f"{qid}_text",
-                    placeholder="Optionnel - apparaîtra dans votre rapport",
+                    placeholder="Optionnel - apparaitra dans votre rapport et nourrira notre echange si vous souhaitez approfondir.",
                     max_chars=200,
+                    height=80,
                 )
                 answers[f"{qid}_text"] = txt or ""
 
@@ -441,6 +442,26 @@ def render_results(config: dict) -> None:
             unsafe_allow_html=True,
         )
 
+    # ── Encadre pedagogie 'Comment lire vos resultats' ──
+    with st.expander("ℹ️ Comment lire vos resultats", expanded=False):
+        st.markdown(
+            """
+**Niveau de maturite (echelle 1 a 5)** :
+
+- **1 - Initial** : l'IA reste une intention diffuse, sans cadre ni pilotage
+- **2 - Aware** : conscience, premiers pilotes, gouvernance emergente
+- **3 - Defined** : pratiques formalisees, premiers cas en production, perimetres definis
+- **4 - Managed** : pilotage par KPI, scaling actif, gouvernance operationnelle
+- **5 - Optimized** : IA integree a la strategie et aux operations, mesure d'impact systematique
+
+**Forces** : axes ou vous avez score 4 ou 5 sur 5. Ce sont vos atouts sur lesquels capitaliser.
+
+**Zones de progres prioritaires** : axes ou vous avez score 1 ou 2. Ce sont les leviers a activer en priorite. Une severite haute indique un poids fort dans le framework combine avec un score bas.
+
+**Repere de marche** : selon nos observations, la maturite IA moyenne des ETI françaises se situe entre niveau 2 et 3. Atteindre le niveau 4 demande generalement 18 a 36 mois de transformation structuree.
+            """
+        )
+
     st.divider()
 
     # ── Radar ──
@@ -460,6 +481,12 @@ def render_results(config: dict) -> None:
         )
 
     # ── Forces / Zones de progrès ──
+    st.caption(
+        "Vos forces sont les axes scorant 4 ou 5 sur 5. Vos zones de progres sont "
+        "les axes scorant 1 ou 2. Si aucun axe n'atteint ces seuils, le radar "
+        "vous donne quand meme une lecture relative de vos points d'appui et "
+        "de vos chantiers."
+    )
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("### ✅ Vos forces")

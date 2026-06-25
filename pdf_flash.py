@@ -238,31 +238,38 @@ def _build_header_table(result: FlashResult, styles: dict) -> Table:
 
 
 def _build_strengths_gaps_table(result: FlashResult, styles: dict) -> Table:
-    """Deux colonnes : forces vs zones de progrès."""
-    strengths_block = [Paragraph("<b>Forces (axes ≥ 4 / 5)</b>", styles["Section"])]
+    """Forces et zones de progres empilees verticalement (une colonne).
+
+    Avant : 2 colonnes cote a cote de 8.5 cm chacune, soit 17 cm. Probleme :
+    cette sous-table devait tenir dans la colonne droite (8.6 cm) a cote du
+    radar, et debordait largement. Nouveau layout : une seule colonne qui
+    s'inscrit dans les 8.6 cm disponibles.
+    """
+    rows = []
+
+    # Bloc Forces
+    rows.append([Paragraph("<b>Forces (axes &ge; 4 / 5)</b>", styles["Section"])])
     if result.strengths:
         for code, name, score in result.strengths:
-            strengths_block.append(Paragraph(
-                f"✓ <b>{code}</b> - {name} ({score}/5)",
+            rows.append([Paragraph(
+                f"&#10003; <b>{code}</b> - {name} ({score}/5)",
                 styles["Strength"],
-            ))
+            )])
     else:
-        strengths_block.append(Paragraph(
-            "Aucun axe ne ressort en force marquée - terrain d'opportunité.",
+        rows.append([Paragraph(
+            "Aucun axe ne ressort en force marquee - terrain d'opportunite.",
             styles["Body"],
-        ))
+        )])
 
-    gaps_block = [Paragraph("<b>Zones de progrès prioritaires</b>", styles["Section"])]
+    # Bloc Zones de progres
+    rows.append([Paragraph("<b>Zones de progres prioritaires</b>", styles["Section"])])
     for code, name, score in result.gaps:
-        gaps_block.append(Paragraph(
-            f"▸ <b>{code}</b> - {name} ({score}/5)",
+        rows.append([Paragraph(
+            f"&#9656; <b>{code}</b> - {name} ({score}/5)",
             styles["Gap"],
-        ))
+        )])
 
-    table = Table(
-        [[strengths_block, gaps_block]],
-        colWidths=[8.5 * cm, 8.5 * cm],
-    )
+    table = Table(rows, colWidths=[8.5 * cm])
     table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
