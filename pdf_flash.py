@@ -28,6 +28,7 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import (
     Image,
+    PageBreak,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -446,6 +447,99 @@ def generate_flash_pdf(
         "organisation (architecture BYOLLM), cross-check budget IT, plan de "
         "transformation actionnable), contactez IstadAi : "
         '<a href="mailto:pierre-alain.laval@istada.fr"><b>pierre-alain.laval@istada.fr</b></a>',
+        styles["Body"],
+    ))
+
+    # ── Annexe : réponses détaillées (traçabilité RGPD) ──
+    story.append(PageBreak())
+    story.append(Paragraph(
+        "ANNEXE - VOS REPONSES DETAILLEES",
+        styles["Title"],
+    ))
+    story.append(Paragraph(
+        f"Organisation : <b>{result.organization}</b> &nbsp;|&nbsp; "
+        f"Répondant : <b>{result.role}</b> &nbsp;|&nbsp; "
+        f"Date : <b>{date_str}</b>",
+        styles["Subtitle"],
+    ))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(
+        "Cette annexe restitue intégralement les réponses fournies lors de "
+        "l'audit, afin que vous puissiez les relire, les contester ou les "
+        "réutiliser. Conformité RGPD : ces données vous appartiennent.",
+        styles["Body"],
+    ))
+    story.append(Spacer(1, 6))
+
+    # Pour chaque axe scoré, on liste : nom, ancre choisie, multiselect, verbatim
+    for code in result.axis_scores:
+        name = result.axis_names.get(code, code)
+        score = result.axis_scores[code]
+        anchor_text = result.chosen_anchors.get(code, "(non renseigné)")
+
+        story.append(Paragraph(
+            f"<b>{code} - {name}</b> &nbsp;|&nbsp; "
+            f"Score auto-évalué : <b>{score} / 5</b>",
+            styles["Section"],
+        ))
+        story.append(Paragraph(
+            f"<i>Ancre choisie :</i> {anchor_text}",
+            styles["Body"],
+        ))
+
+        # Multiselect (stack IA pour D, potentiellement d'autres axes plus tard)
+        ms_choices = result.multiselects.get(code, [])
+        if ms_choices:
+            story.append(Paragraph(
+                "<i>Outils ou éléments cochés :</i>",
+                styles["Body"],
+            ))
+            for choice in ms_choices:
+                story.append(Paragraph(
+                    f"&#8226; {choice}",
+                    styles["Body"],
+                ))
+
+        # Verbatim libre
+        verbatim = result.text_inputs.get(code, "")
+        if verbatim:
+            story.append(Paragraph(
+                f"<i>Votre verbatim :</i> &laquo; {verbatim} &raquo;",
+                styles["Body"],
+            ))
+        else:
+            story.append(Paragraph(
+                "<i>Votre verbatim :</i> (non renseigné)",
+                styles["Body"],
+            ))
+        story.append(Spacer(1, 4))
+
+    # Question transverse Q9
+    story.append(Paragraph(
+        f"<b>Question transverse - Maturité globale réelle</b> &nbsp;|&nbsp; "
+        f"Score déclaré : <b>{result.q9_real_score} / 5</b>",
+        styles["Section"],
+    ))
+    if result.q9_chosen_anchor:
+        story.append(Paragraph(
+            f"<i>Ancre choisie :</i> {result.q9_chosen_anchor}",
+            styles["Body"],
+        ))
+    story.append(Spacer(1, 8))
+
+    # Rappel du score global et du niveau
+    story.append(Paragraph(
+        f"<b>Score global calculé</b> : moyenne arithmétique des 8 axes = "
+        f"<b>{result.global_score:.2f} / 5</b> (niveau {result.level} - "
+        f"{result.level_name})",
+        styles["Body"],
+    ))
+    story.append(Paragraph(
+        f"<b>Dissonance déclaratif vs réel</b> : écart de "
+        f"<b>{result.dissonance_declaratif_vs_reel:.2f} point</b> entre "
+        f"maturité moyenne sur les ancres ({result.global_score:.2f}) et "
+        f"maturité réelle déclarée sur la question transverse "
+        f"({result.q9_real_score}).",
         styles["Body"],
     ))
 

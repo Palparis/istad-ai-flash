@@ -27,7 +27,9 @@ class FlashResult:
     axis_names: dict[str, str]  # {axis_code: name}
     text_inputs: dict[str, str]  # {axis_code: phrase libre}
     multiselects: dict[str, list[str]]  # {axis_code: options cochées} - Q3 IA stack notamment
+    chosen_anchors: dict[str, str]  # {axis_code: texte intégral de l'ancre choisie} - pour annexe PDF
     q9_real_score: int  # score Q9 transverse (cas d'usage en prod réels)
+    q9_chosen_anchor: str  # texte intégral de l'ancre Q9 choisie
     global_score: float
     level: int
     level_name: str
@@ -76,19 +78,24 @@ def compute_flash_result(
     axis_names: dict[str, str] = {}
     text_inputs: dict[str, str] = {}
     multiselects: dict[str, list[str]] = {}
+    chosen_anchors: dict[str, str] = {}
     q9_real_score = 3  # fallback
+    q9_chosen_anchor = ""
 
     for q in questions:
         qid = q["id"]
         axis_code = q["axis_code"]
         score = int(answers.get(qid, 3))
+        anchor_text = q.get("anchors", {}).get(score, "")
 
         if axis_code.startswith("TRANSVERSE"):
             q9_real_score = score
+            q9_chosen_anchor = anchor_text
             continue
 
         axis_scores[axis_code] = score
         axis_names[axis_code] = q["axis_name"]
+        chosen_anchors[axis_code] = anchor_text
         text_value = (answers.get(f"{qid}_text") or "").strip()
         if text_value:
             text_inputs[axis_code] = text_value
@@ -139,7 +146,9 @@ def compute_flash_result(
         axis_names=axis_names,
         text_inputs=text_inputs,
         multiselects=multiselects,
+        chosen_anchors=chosen_anchors,
         q9_real_score=q9_real_score,
+        q9_chosen_anchor=q9_chosen_anchor,
         global_score=round(global_score, 2),
         level=level,
         level_name=level_name,
