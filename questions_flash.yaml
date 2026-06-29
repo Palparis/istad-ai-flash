@@ -73,14 +73,29 @@ questions:
   - id: q3
     axis_code: D
     axis_name: "Données & Technologie"
-    text_prompt: "Décrivez l'état actuel de votre socle data (qualité, accessibilité, gouvernance)."
-    eval_prompt: "Évaluez le niveau de maturité de votre socle data."
+    multiselect:
+      label: "Quel(s) outil(s) ou stack IA utilisez-vous aujourd'hui ? (cochez tout ce qui s'applique - au moins une réponse)"
+      required: true
+      options:
+        - "Aucun, ou usage individuel non encadré (ChatGPT grand public personnel)"
+        - "ChatGPT Enterprise / Team / Plus"
+        - "Microsoft Copilot (M365, GitHub)"
+        - "Claude (Anthropic) Team / Enterprise"
+        - "Mistral Le Chat / API"
+        - "Google Gemini / Vertex AI"
+        - "GPTs internes ou agents no-code"
+        - "RAG sur base documentaire interne"
+        - "Agents métier en production (workflows automatisés)"
+        - "Modèle propriétaire ou fine-tuné en interne"
+        - "Autre (précisez dans la zone de texte ci-dessous)"
+    text_prompt: "Décrivez l'état actuel de votre socle data ET votre usage IA (qualité, accessibilité, gouvernance, outils déployés, périmètre métier)."
+    eval_prompt: "Évaluez le niveau de maturité globale (socle data + stack IA)."
     anchors:
-      1: "Données dispersées, qualité non maîtrisée."
-      2: "Data lake ou DWH mais qualité hétérogène."
-      3: "Socle data structuré, gouvernance émergente."
-      4: "Socle data fiable, gouvernance opérationnelle, accès self-service partiel."
-      5: "Data products gouvernés, mesh ou platform, observabilité bout-en-bout."
+      1: "Données dispersées, aucun outil IA déployé ou usage personnel non encadré."
+      2: "Data lake/DWH avec qualité hétérogène, OU LLM SaaS souscrit en mode chat individuel."
+      3: "Socle data structuré OU LLM déployé avec charte d'usage et premières expérimentations métier cadrées."
+      4: "Socle data fiable ET LLM intégré aux process clés via API, agents simples ou GPTs métier."
+      5: "Data products gouvernés ET architecture IA mature (RAG, agents métier en prod, ou modèle propriétaire avec observabilité)."
 
   - id: q4
     axis_code: O

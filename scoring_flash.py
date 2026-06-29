@@ -26,6 +26,7 @@ class FlashResult:
     axis_scores: dict[str, int]  # {axis_code: score 1-5} pour les 8 axes
     axis_names: dict[str, str]  # {axis_code: name}
     text_inputs: dict[str, str]  # {axis_code: phrase libre}
+    multiselects: dict[str, list[str]]  # {axis_code: options cochées} - Q3 IA stack notamment
     q9_real_score: int  # score Q9 transverse (cas d'usage en prod réels)
     global_score: float
     level: int
@@ -74,6 +75,7 @@ def compute_flash_result(
     axis_scores: dict[str, int] = {}
     axis_names: dict[str, str] = {}
     text_inputs: dict[str, str] = {}
+    multiselects: dict[str, list[str]] = {}
     q9_real_score = 3  # fallback
 
     for q in questions:
@@ -90,6 +92,11 @@ def compute_flash_result(
         text_value = (answers.get(f"{qid}_text") or "").strip()
         if text_value:
             text_inputs[axis_code] = text_value
+        ms_value = answers.get(f"{qid}_multiselect") or []
+        if ms_value:
+            multiselects[axis_code] = [
+                opt for opt in ms_value if isinstance(opt, str) and opt.strip()
+            ]
 
     # Score global = moyenne arithmétique des 8 axes
     if axis_scores:
@@ -131,6 +138,7 @@ def compute_flash_result(
         axis_scores=axis_scores,
         axis_names=axis_names,
         text_inputs=text_inputs,
+        multiselects=multiselects,
         q9_real_score=q9_real_score,
         global_score=round(global_score, 2),
         level=level,

@@ -141,9 +141,18 @@ def _build_user_prompt(result: FlashResult) -> str:
     forces_affichees = [f"{code} - {name} ({score}/5)" for code, name, score in result.strengths]
     zones_affichees = [f"{code} - {name} ({score}/5)" for code, name, score in result.gaps]
 
+    # Stack IA déclaré par le répondant (multiselect Q3 notamment)
+    ia_stack_d = result.multiselects.get("D", [])
+    ia_stack_str = (
+        ", ".join(ia_stack_d) if ia_stack_d
+        else "(non renseigné)"
+    )
+
     return f"""Tu analyses l'audit flash maturité IA de l'organisation **{result.organization}**, répondant en rôle de **{result.role}**.
 
 Score global : **{result.global_score:.2f} / 5** (niveau {result.level} - {result.level_name}).
+
+**Stack IA déclaré sur l'axe D - Données & Technologie** : {ia_stack_str}
 
 L'écran de résultats affiche déjà au répondant :
 - **Vos forces** : {forces_affichees if forces_affichees else "(aucune force notable affichée)"}
@@ -179,6 +188,7 @@ Pour les insights forces et zones_progres :
 - Tu dois fournir UNE insight pour CHAQUE code d'axe listé respectivement dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus.
 - Utilise le code court (V, P, D, O, T, A, M, G) comme clé du dict.
 - Si la liste 'Vos forces' est vide, retourne un objet vide {{}} pour forces_insights.
+- **Cas spécial axe D** : si D apparaît dans les forces ou les zones de progrès, l'insight DOIT citer le stack IA déclaré (ex : 'ChatGPT Enterprise déployé sans agent métier en production' ou 'Aucun LLM, ChatGPT grand public en usage personnel'). Ne reste pas générique sur la data quand le stack IA est connu.
 
 Contraintes critiques :
 - **Cohérence visuelle** : le commentaire doit citer les axes listés dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus, pas en désigner d'autres. Le répondant ne doit pas avoir l'impression que le commentaire parle d'un autre audit que celui qu'il voit à l'écran.

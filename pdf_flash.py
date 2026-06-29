@@ -371,6 +371,17 @@ def generate_flash_pdf(
             styles["Body"],
         ))
 
+    # ── Stack IA déclaré (multiselect Q3) ──
+    ia_stack_d = result.multiselects.get("D", [])
+    if ia_stack_d:
+        story.append(Paragraph(
+            "VOTRE STACK IA DECLARE", styles["Section"]
+        ))
+        story.append(Paragraph(
+            " &#8226; ".join(ia_stack_d),
+            styles["Body"],
+        ))
+
     # ── Phrases libres ──
     if result.text_inputs:
         story.append(Paragraph(

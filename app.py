@@ -211,6 +211,16 @@ def render_questionnaire(config: dict) -> None:
                 else f"### {i}. {q['axis_name']} *(transverse)*"
             )
 
+            # Multiselect (si défini) - typiquement Q3 stack IA
+            if q.get("multiselect"):
+                ms_cfg = q["multiselect"]
+                ms_choices = st.multiselect(
+                    ms_cfg.get("label", "Cochez tout ce qui s'applique"),
+                    options=ms_cfg.get("options", []),
+                    key=f"{qid}_multiselect",
+                )
+                answers[f"{qid}_multiselect"] = ms_choices
+
             # Champ texte libre (si défini)
             if q.get("text_prompt"):
                 txt = st.text_area(
@@ -256,6 +266,22 @@ def render_questionnaire(config: dict) -> None:
                 f"Merci de répondre à toutes les questions ({len(missing)} "
                 f"question{'s' if len(missing) > 1 else ''} restante"
                 f"{'s' if len(missing) > 1 else ''})."
+            )
+            return
+
+        # Vérifier les multiselects obligatoires
+        missing_ms = []
+        for q in questions:
+            ms_cfg = q.get("multiselect")
+            if not ms_cfg or not ms_cfg.get("required"):
+                continue
+            chosen = answers.get(f"{q['id']}_multiselect") or []
+            if not chosen:
+                missing_ms.append(q["axis_code"])
+        if missing_ms:
+            st.error(
+                "Merci de cocher au moins une option dans la liste des outils IA "
+                f"pour la question : {', '.join(missing_ms)}."
             )
             return
 

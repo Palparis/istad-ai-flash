@@ -206,6 +206,15 @@ def _build_lead_email_html(
     else:
         verbatims_html = "<p><em>Aucun verbatim fourni par le répondant.</em></p>"
 
+    # Stack IA déclaré sur Q3 (multiselect)
+    ia_stack_d = result.multiselects.get("D", [])
+    if ia_stack_d:
+        ia_stack_html = "".join(
+            f"<li>{tool}</li>" for tool in ia_stack_d
+        )
+    else:
+        ia_stack_html = "<li><em>Non renseigné</em></li>"
+
     # Dissonance
     dissonance_html = ""
     if result.has_dissonance:
@@ -275,6 +284,12 @@ def _build_lead_email_html(
 
     <h3 style="color: #D32F2F; margin-top: 16px;">🎯 Zones de progrès prioritaires</h3>
     <ul>{gaps_html}</ul>
+
+    <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
+               margin-top: 24px;">
+        Stack IA déclaré (Q3 - Données & Technologie)
+    </h3>
+    <ul style="font-size: 14px;">{ia_stack_html}</ul>
 
     <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
                margin-top: 24px;">
