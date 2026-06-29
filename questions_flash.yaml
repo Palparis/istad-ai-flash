@@ -188,12 +188,19 @@ consent_text: |
   ne sont **jamais partagées avec un tiers**. Vous pouvez à tout moment
   demander leur suppression par email à pierre-alain.laval@istada.fr.
 
-  L'IA intervient dans l'**audit complet** d'IstadAi (entretiens multi-sponsors,
-  **analyses augmentées par l'IA de votre organisation**, détection automatique
-  des dissonances, narration des livrables COMEX) - toujours opérée via
-  **l'instance IA de votre organisation** (architecture **BYOLLM**, *Bring Your
-  Own LLM*) pour garantir la sécurité, la souveraineté et la conformité de vos
-  données. IstadAi ne dispose à aucun moment de vos données qualitatives.
+  **Architecture IA selon le périmètre.**
+
+  Dans cet **audit flash** : l'analyse qualitative optionnelle (si vous y
+  consentez à l'étape suivante) passe par notre propre clé API Anthropic,
+  avec les garanties listées ci-dessus (pas d'entraînement, pas de revente,
+  suppression sous 30 jours).
+
+  Dans l'**audit complet** d'IstadAi (entretiens multi-sponsors, analyses
+  augmentées par l'IA, détection automatique des dissonances, narration des
+  livrables COMEX) : l'IA est opérée via **l'instance IA de votre
+  organisation** (architecture **BYOLLM**, *Bring Your Own LLM*) pour garantir
+  souveraineté et conformité de bout en bout. IstadAi ne dispose à aucun
+  moment de vos données qualitatives dans ce périmètre.
 
   Le résultat affiché est indicatif et ne se substitue pas à un audit
   complet, qui reste l'expression d'un avis professionnel motivé.
