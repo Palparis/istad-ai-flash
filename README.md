@@ -1,7 +1,9 @@
 # IstadAi - Audit Flash Maturité IA
 
-Pré-diagnostic gratuit en 10 questions, 5-10 minutes. Pas de LLM, pas de
-capture lead, scoring 100% déterministe. Lien partageable pour test marché.
+Pré-diagnostic gratuit en 10 questions, 5-10 minutes. Scoring 100%
+déterministe sur 8 axes, analyse qualitative optionnelle par Claude
+(Anthropic) avec garanties anti-training contractuelles, synthèse PDF
+immédiate. Lien partageable pour test marché.
 
 ## Architecture
 
@@ -16,7 +18,9 @@ agent-audit-flash/
 └── README.md
 ```
 
-Aucune dépendance à `shared/` (pas de LLM en v0). 100% autonome.
+Aucune dépendance à `shared/`. L'analyse LLM (optionnelle, consent-based)
+utilise directement le SDK `anthropic` avec une clé API dédiée et un cost
+guard local (caps quotidien et mensuel). Module 100% autonome.
 
 ## Configuration SMTP (notifications leads)
 
