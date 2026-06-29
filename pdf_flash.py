@@ -36,6 +36,7 @@ from reportlab.platypus import (
 )
 
 from scoring_flash import FlashResult
+from verbatim_analyzer import VerbatimAnalysis
 
 # Couleurs IstadAi
 COLOR_PRIMARY = colors.HexColor("#1F365A")
@@ -282,8 +283,16 @@ def _build_strengths_gaps_table(result: FlashResult, styles: dict) -> Table:
 # Build PDF
 # ============================================================
 
-def generate_flash_pdf(result: FlashResult) -> bytes:
-    """Génère le PDF de synthèse de l'audit flash (1 page A4)."""
+def generate_flash_pdf(
+    result: FlashResult,
+    verbatim_analysis: VerbatimAnalysis | None = None,
+) -> bytes:
+    """Génère le PDF de synthèse de l'audit flash.
+
+    Si verbatim_analysis est fourni (analyse LLM Anthropic des phrases libres),
+    le PDF contient une section supplémentaire 'Lecture personnalisée IstadAi'
+    avec le commentaire LLM + les dissonances détectées.
+    """
     styles = _build_styles()
     buffer = io.BytesIO()
 
@@ -365,6 +374,45 @@ def generate_flash_pdf(result: FlashResult) -> bytes:
                     styles["Quote"],
                 ))
 
+    # ── Analyse personnalisée Claude (si présente) ──
+    if verbatim_analysis is not None and verbatim_analysis.commentaire_personnalise:
+        story.append(Spacer(1, 4))
+        story.append(Paragraph(
+            "LECTURE PERSONNALISEE DE VOS VERBATIMS",
+            styles["Section"],
+        ))
+        # Le commentaire LLM peut contenir des sauts de ligne entre paragraphes.
+        # On les convertit en balises <br/> pour ReportLab.
+        commentaire_html = verbatim_analysis.commentaire_personnalise.replace(
+            "\n\n", "<br/><br/>"
+        ).replace("\n", "<br/>")
+        story.append(Paragraph(commentaire_html, styles["Body"]))
+
+        # Trois types de dissonances rendus séparément pour clarté
+        def _append_dissonance_block(title: str, items: list[str]):
+            if not items:
+                return
+            story.append(Spacer(1, 2))
+            story.append(Paragraph(f"<b>{title}</b>", styles["Body"]))
+            for d in items:
+                story.append(Paragraph(
+                    f"&#9656; <i>{d}</i>",
+                    styles["Quote"],
+                ))
+
+        _append_dissonance_block(
+            "Dissonances entre vos verbatims libres :",
+            verbatim_analysis.dissonances_verbatims,
+        )
+        _append_dissonance_block(
+            "Dissonances entre vos verbatims et les options choisies :",
+            verbatim_analysis.dissonances_verbatim_vs_ancre,
+        )
+        _append_dissonance_block(
+            "Dissonances entre vos scores d'axes (strategy vs execution) :",
+            verbatim_analysis.dissonances_ancres,
+        )
+
     # ── CTA ──
     story.append(Spacer(1, 4))
     story.append(Paragraph(
@@ -387,12 +435,16 @@ def generate_flash_pdf(result: FlashResult) -> bytes:
         "comportementales). Sources théoriques : Harvard AI for Leaders (M1-M4), "
         "Gartner AI Maturity Model, expérience cabinet terrain ETI. Scoring 100 % "
         "déterministe et traçable - à scores identiques, conclusions identiques. "
-        "L'IA intervient dans l'<b>audit complet</b> d'IstadAi (extraction signaux "
-        "entretiens, détection dissonances multi-sponsors, narration livrables "
-        "COMEX), opérée via <b>l'instance IA de votre organisation</b> "
-        "(architecture <b>BYOLLM</b>, <i>Bring Your Own LLM</i>) pour préserver "
-        "la confidentialité, la souveraineté et la conformité de vos données. "
-        "Résultat indicatif - ne se substitue pas à un audit professionnel motivé.",
+        "L'analyse qualitative optionnelle des verbatims libres (si consentement "
+        "accordé) est réalisée par Claude (Anthropic) en tant que sous-traitant, "
+        "sans utilisation des données pour l'entraînement et avec rétention "
+        "limitée à 30 jours. Dans l'<b>audit complet</b> d'IstadAi (extraction "
+        "signaux entretiens, détection dissonances multi-sponsors, narration "
+        "livrables COMEX), l'IA est opérée via <b>l'instance IA de votre "
+        "organisation</b> (architecture <b>BYOLLM</b>, <i>Bring Your Own LLM</i>) "
+        "pour préserver la confidentialité, la souveraineté et la conformité de "
+        "vos données. Résultat indicatif - ne se substitue pas à un audit "
+        "professionnel motivé.",
         styles["Footer"],
     ))
 

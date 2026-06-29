@@ -27,9 +27,12 @@ import streamlit as st
 
 from dotenv import load_dotenv
 
+from cost_guard import get_stats as get_cost_stats
+from cost_guard import increment_counter, is_llm_available
 from lead_notifier import is_valid_email, is_valid_phone, send_lead_notification
 from pdf_flash import generate_flash_pdf
 from scoring_flash import compute_flash_result, load_questions
+from verbatim_analyzer import analyze_verbatims
 
 # Charger .env du monorepo (pour SMTP credentials en dev local)
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -334,6 +337,33 @@ def render_email_gate(config: dict) -> None:
             value=False,
         )
 
+        # Consentement spécifique pour l'analyse LLM des verbatims (optionnel)
+        # Activé par défaut pour maximiser la valeur perçue, mais le répondant
+        # peut décocher s'il préfère un audit purement déterministe.
+        llm_available, llm_reason = is_llm_available()
+        llm_consent = st.checkbox(
+            "J'accepte que mes verbatims et mes scores soient analysés par "
+            "**Claude (Anthropic)** pour enrichir mon rapport d'un commentaire "
+            "personnalisé et de la détection de 3 types de dissonances "
+            "(entre verbatims, verbatim vs ancre, et entre scores d'axes). "
+            "Données traitées par Anthropic en tant que sous-traitant, "
+            "**non utilisées pour entraîner les modèles** ni revendues à des "
+            "tiers (politique contractuelle Anthropic standard), supprimées "
+            "sous 30 jours.",
+            value=llm_available,
+            disabled=not llm_available,
+            help=(
+                "Décochez si vous préférez un audit 100% déterministe sans appel "
+                "à Claude. Votre rapport contiendra alors uniquement le scoring "
+                "des ancres + le radar 8 axes."
+                + (
+                    f" ⚠️ Quota LLM atteint ({llm_reason}), case désactivée."
+                    if not llm_available
+                    else ""
+                )
+            ),
+        )
+
         submitted = st.form_submit_button(
             "Voir mes résultats →", type="primary", use_container_width=True,
         )
@@ -355,9 +385,17 @@ def render_email_gate(config: dict) -> None:
                 st.error(err)
             return
 
-        # ── Envoi de la notification (best effort) ──
+        # ── Analyse LLM optionnelle des verbatims (si consentement + budget OK) ──
+        verbatim_analysis = None
+        if llm_consent and llm_available:
+            with st.spinner("Analyse qualitative de vos verbatims par Claude (Anthropic)…"):
+                verbatim_analysis = analyze_verbatims(result)
+                if verbatim_analysis is not None:
+                    increment_counter()
+
+        # ── Préparation du PDF et envoi de la notification (best effort) ──
         with st.spinner("Préparation de votre rapport personnalisé…"):
-            pdf_bytes = generate_flash_pdf(result)
+            pdf_bytes = generate_flash_pdf(result, verbatim_analysis=verbatim_analysis)
             success, message = send_lead_notification(
                 result=result,
                 lead_email=email.strip(),
@@ -365,6 +403,7 @@ def render_email_gate(config: dict) -> None:
                 lead_last_name=last_name.strip(),
                 lead_phone=phone.strip(),
                 pdf_bytes=pdf_bytes,
+                verbatim_analysis=verbatim_analysis,
             )
 
         if not success:
@@ -381,6 +420,7 @@ def render_email_gate(config: dict) -> None:
         # clés de widget - Streamlit refuse les double-affectations.
         st.session_state["lead_captured"] = True
         st.session_state["lead_pdf_bytes"] = pdf_bytes
+        st.session_state["verbatim_analysis"] = verbatim_analysis
         st.rerun()
 
 
@@ -496,6 +536,43 @@ def render_results(config: dict) -> None:
             f"Signal classique d'organisation en phase d'ambition, à transformer "
             f"en exécution."
         )
+
+    # ── Lecture personnalisée Claude (si présente) ──
+    analysis = st.session_state.get("verbatim_analysis")
+    if analysis is not None and analysis.commentaire_personnalise:
+        st.markdown("### 🧠 Lecture personnalisée de vos verbatims")
+        st.caption(
+            "Analyse qualitative produite par Claude (Anthropic) à partir de "
+            f"vos phrases libres. Coût estimé : {analysis.cost_estimate_eur:.4f} EUR. "
+            "Anthropic ne réutilise pas les inputs/outputs pour entraîner ses "
+            "modèles (politique contractuelle standard)."
+        )
+        st.info(analysis.commentaire_personnalise)
+
+        # Trois types de dissonances rendus séparément (chacun en expander)
+        total_diss = (
+            len(analysis.dissonances_verbatims)
+            + len(analysis.dissonances_verbatim_vs_ancre)
+            + len(analysis.dissonances_ancres)
+        )
+        if total_diss > 0:
+            with st.expander(
+                f"⚠️ {total_diss} dissonance(s) détectée(s) - 3 types analysés",
+                expanded=False,
+            ):
+                if analysis.dissonances_verbatims:
+                    st.markdown("**Entre vos verbatims libres :**")
+                    for d in analysis.dissonances_verbatims:
+                        st.warning(d)
+                if analysis.dissonances_verbatim_vs_ancre:
+                    st.markdown("**Entre vos verbatims et les options choisies :**")
+                    for d in analysis.dissonances_verbatim_vs_ancre:
+                        st.warning(d)
+                if analysis.dissonances_ancres:
+                    st.markdown("**Entre vos scores d'axes (strategy vs execution) :**")
+                    for d in analysis.dissonances_ancres:
+                        st.warning(d)
+        st.divider()
 
     # ── Forces / Zones de progrès ──
     st.caption(

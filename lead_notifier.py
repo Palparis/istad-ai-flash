@@ -32,6 +32,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from scoring_flash import FlashResult
+from verbatim_analyzer import VerbatimAnalysis
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,7 @@ def send_lead_notification(
     lead_last_name: str,
     lead_phone: str,
     pdf_bytes: bytes | None = None,
+    verbatim_analysis: VerbatimAnalysis | None = None,
 ) -> tuple[bool, str]:
     """Envoie une notification email à IstadAi avec le récap de l'audit.
 
@@ -110,7 +112,8 @@ def send_lead_notification(
     msg["Reply-To"] = lead_email  # permet de répondre directement au lead
 
     html_body = _build_lead_email_html(
-        result, lead_email, lead_first_name, lead_last_name, lead_phone
+        result, lead_email, lead_first_name, lead_last_name, lead_phone,
+        verbatim_analysis,
     )
     msg.attach(MIMEText(html_body, "html", "utf-8"))
 
@@ -154,6 +157,7 @@ def _build_lead_email_html(
     lead_first_name: str,
     lead_last_name: str,
     lead_phone: str,
+    verbatim_analysis: VerbatimAnalysis | None = None,
 ) -> str:
     """Construit le corps HTML du mail récap."""
     now_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
@@ -266,6 +270,8 @@ def _build_lead_email_html(
     </h3>
     {verbatims_html}
 
+    {_build_verbatim_analysis_html(verbatim_analysis)}
+
     <hr style="margin-top: 32px; border: none; border-top: 1px solid #ddd;">
     <p style="color: #999; font-size: 12px;">
         Mail généré automatiquement par l'app Audit Flash IstadAi.<br>
@@ -273,4 +279,54 @@ def _build_lead_email_html(
         Pour répondre au lead, utilise l'adresse en Reply-To (déjà préremplie).
     </p>
     </body></html>
+    """
+
+
+def _build_verbatim_analysis_html(analysis: VerbatimAnalysis | None) -> str:
+    """Rend la section 'Lecture personnalisée Claude' du mail si analyse présente."""
+    if analysis is None or not analysis.commentaire_personnalise:
+        return ""
+
+    commentaire_html = analysis.commentaire_personnalise.replace(
+        "\n\n", "<br/><br/>"
+    ).replace("\n", "<br/>")
+
+    def _bloc(title: str, items: list[str]) -> str:
+        if not items:
+            return ""
+        lis = "".join(f"<li><i>{d}</i></li>" for d in items)
+        return (
+            f'<p style="margin-top: 12px;"><b>{title}</b></p>'
+            f"<ul>{lis}</ul>"
+        )
+
+    diss_html = (
+        _bloc(
+            f"Dissonances entre verbatims libres ({len(analysis.dissonances_verbatims)})",
+            analysis.dissonances_verbatims,
+        )
+        + _bloc(
+            f"Dissonances verbatim vs ancre choisie ({len(analysis.dissonances_verbatim_vs_ancre)})",
+            analysis.dissonances_verbatim_vs_ancre,
+        )
+        + _bloc(
+            f"Dissonances entre scores d'axes / strategy gap ({len(analysis.dissonances_ancres)})",
+            analysis.dissonances_ancres,
+        )
+    )
+
+    return f"""
+    <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
+               margin-top: 24px;">
+        Lecture personnalisée (Claude)
+    </h3>
+    <div style="background: #F4F6FA; padding: 12px; border-radius: 6px;">
+        <p>{commentaire_html}</p>
+        {diss_html}
+        <p style="color: #999; font-size: 11px; margin-top: 8px;">
+            Coût estimé de l'analyse : {analysis.cost_estimate_eur:.4f} EUR.
+            Anthropic ne réutilise pas les inputs/outputs API pour entraîner
+            ses modèles (politique contractuelle standard).
+        </p>
+    </div>
     """
