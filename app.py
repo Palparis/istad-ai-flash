@@ -219,11 +219,17 @@ def render_questionnaire(config: dict) -> None:
                 )
                 answers[f"{qid}_text"] = txt or ""
 
-            # Auto-évaluation 5 ancres
-            anchor_labels = [
-                f"{level} - {q['anchors'][level]}"
-                for level in sorted(q["anchors"].keys())
-            ]
+            # Auto-évaluation 5 ancres (sans afficher le score 1-5)
+            #
+            # Insight Celia Felipe (25 juin 2026) : afficher le chiffre 1-5 a
+            # cote des ancres induit un biais de desirabilite sociale (le
+            # repondant choisit l'option "un peu meilleure" pour ne pas se
+            # devaluer). On cache donc le chiffre dans l'affichage tout en
+            # gardant le mapping description -> score en backend.
+            sorted_levels = sorted(q["anchors"].keys())
+            anchor_labels = [q["anchors"][level] for level in sorted_levels]
+            anchor_to_score = {q["anchors"][level]: level for level in sorted_levels}
+
             choice = st.radio(
                 q["eval_prompt"],
                 options=anchor_labels,
@@ -231,8 +237,7 @@ def render_questionnaire(config: dict) -> None:
                 key=f"{qid}_radio",
             )
             if choice is not None:
-                # Extraire le numéro (premier caractère)
-                answers[qid] = int(choice.split(" - ", 1)[0])
+                answers[qid] = anchor_to_score[choice]
 
             st.markdown("---")
 
