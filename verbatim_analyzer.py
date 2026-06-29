@@ -60,11 +60,20 @@ class VerbatimAnalysis:
     - dissonances_verbatims : entre les verbatims libres entre eux
     - dissonances_verbatim_vs_ancre : entre un verbatim et l'ancre choisie
     - dissonances_ancres : entre les ancres choisies (cross-axes)
+
+    Enrichissement des cartouches forces / zones de progrès :
+    - forces_insights : pour chaque axe-force (code), une phrase courte
+      qui qualifie la nature du point d'appui, basée sur le verbatim
+      quand il est rempli.
+    - zones_insights : pour chaque axe-gap (code), une phrase courte
+      qui pointe le chantier prioritaire et sa nature.
     """
     commentaire_personnalise: str
     dissonances_verbatims: list[str]
     dissonances_verbatim_vs_ancre: list[str]
     dissonances_ancres: list[str]
+    forces_insights: dict[str, str]
+    zones_insights: dict[str, str]
     cost_estimate_eur: float
 
     @property
@@ -151,12 +160,25 @@ Réponds en JSON strict avec exactement cette structure :
 {{
   "commentaire_personnalise": "<2 paragraphes courts (2-3 phrases chacun, environ 250-350 mots au total). Paragraphe 1 : ce que le profil global révèle (forces et zones de progrès) sur la maturité IA de l'organisation. **Tu dois explicitement nommer les axes 'forces' et 'zones de progrès' listés ci-dessus** pour rester cohérent avec ce que voit le répondant à l'écran. Tu peux nuancer ou enrichir avec les verbatims, mais sans contredire la liste. Paragraphe 2 : 1-2 actions concrètes que cette organisation pourrait engager dans les 90 jours, ancrées sur les zones de progrès identifiées. Ton senior cabinet, impersonnel, sans formules marketing.>",
 
+  "forces_insights": {{
+    "<code_axe>": "<1 phrase de 15-25 mots qui qualifie en quoi cet axe constitue un point d'appui concret pour CETTE organisation. Si le verbatim de l'axe est rempli, ancre l'insight dessus. Sinon, base-toi sur le score et le contexte global. Pas de généralité, pas de promesse marketing.>"
+  }},
+
+  "zones_progres_insights": {{
+    "<code_axe>": "<1 phrase de 15-25 mots qui pointe la nature du gap et le chantier prioritaire. Si le verbatim est rempli, cite l'élément concret qui révèle le gap. Sinon, ancre sur ce qu'implique un score si bas pour cet axe. Pas de généralité.>"
+  }},
+
   "dissonances_verbatims": ["<TYPE A - liste de 0 à 3 dissonances entre verbatims libres. Format : '<axe X> vs <axe Y> : <explicitation de l'écart en 15-25 mots>'. Liste vide [] si aucune contradiction notable.>"],
 
   "dissonances_verbatim_vs_ancre": ["<TYPE B - liste de 0 à 4 dissonances entre verbatims libres et ancres choisies. Format : 'Axe X : verbatim dit <X> mais ancre choisie correspond à <Y>'. Liste vide [] si aucune dissonance notable.>"],
 
   "dissonances_ancres": ["<TYPE C - liste de 0 à 3 dissonances entre ancres elles-mêmes (cross-axes), notamment écarts notables entre axes stratégiques et axes d'exécution. Format : 'Axe X (score N) vs Axe Y (score M) : <explicitation en 15-25 mots>'. Liste vide [] si pas d'écart significatif (différence >= 2 points).>"]
 }}
+
+Pour les insights forces et zones_progres :
+- Tu dois fournir UNE insight pour CHAQUE code d'axe listé respectivement dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus.
+- Utilise le code court (V, P, D, O, T, A, M, G) comme clé du dict.
+- Si la liste 'Vos forces' est vide, retourne un objet vide {{}} pour forces_insights.
 
 Contraintes critiques :
 - **Cohérence visuelle** : le commentaire doit citer les axes listés dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus, pas en désigner d'autres. Le répondant ne doit pas avoir l'impression que le commentaire parle d'un autre audit que celui qu'il voit à l'écran.
@@ -249,6 +271,18 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
             diss_v_vs_a = _coerce_str_list(parsed.get("dissonances"))
         diss_ancres = _coerce_str_list(parsed.get("dissonances_ancres"))
 
+        def _coerce_str_dict(value) -> dict[str, str]:
+            if not isinstance(value, dict):
+                return {}
+            return {
+                str(k).strip().upper(): str(v).strip()
+                for k, v in value.items()
+                if v and str(v).strip()
+            }
+
+        forces_ins = _coerce_str_dict(parsed.get("forces_insights"))
+        zones_ins = _coerce_str_dict(parsed.get("zones_progres_insights"))
+
         if not commentaire:
             logger.warning(
                 "Commentaire LLM vide ou non parseable. "
@@ -262,6 +296,8 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
             dissonances_verbatims=diss_verbatims,
             dissonances_verbatim_vs_ancre=diss_v_vs_a,
             dissonances_ancres=diss_ancres,
+            forces_insights=forces_ins,
+            zones_insights=zones_ins,
             cost_estimate_eur=cost_eur,
         )
 

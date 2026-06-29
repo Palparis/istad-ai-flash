@@ -238,24 +238,34 @@ def _build_header_table(result: FlashResult, styles: dict) -> Table:
     return table
 
 
-def _build_strengths_gaps_table(result: FlashResult, styles: dict) -> Table:
+def _build_strengths_gaps_table(
+    result: FlashResult,
+    styles: dict,
+    verbatim_analysis: VerbatimAnalysis | None = None,
+) -> Table:
     """Forces et zones de progres empilees verticalement (une colonne).
 
     Avant : 2 colonnes cote a cote de 8.5 cm chacune, soit 17 cm. Probleme :
     cette sous-table devait tenir dans la colonne droite (8.6 cm) a cote du
     radar, et debordait largement. Nouveau layout : une seule colonne qui
     s'inscrit dans les 8.6 cm disponibles.
+
+    Si verbatim_analysis est fourni, on enrichit chaque cartouche d'une
+    insight LLM courte (1 phrase) sous le code + nom + score.
     """
     rows = []
+    forces_insights = verbatim_analysis.forces_insights if verbatim_analysis else {}
+    zones_insights = verbatim_analysis.zones_insights if verbatim_analysis else {}
 
     # Bloc Forces
     rows.append([Paragraph("<b>Forces (axes &ge; 4 / 5)</b>", styles["Section"])])
     if result.strengths:
         for code, name, score in result.strengths:
-            rows.append([Paragraph(
-                f"&#10003; <b>{code}</b> - {name} ({score}/5)",
-                styles["Strength"],
-            )])
+            line = f"&#10003; <b>{code}</b> - {name} ({score}/5)"
+            insight = forces_insights.get(code)
+            if insight:
+                line += f"<br/><font size=\"8\">{insight}</font>"
+            rows.append([Paragraph(line, styles["Strength"])])
     else:
         rows.append([Paragraph(
             "Aucun axe ne ressort en force marquée - terrain d'opportunité.",
@@ -265,10 +275,11 @@ def _build_strengths_gaps_table(result: FlashResult, styles: dict) -> Table:
     # Bloc Zones de progrès
     rows.append([Paragraph("<b>Zones de progrès prioritaires</b>", styles["Section"])])
     for code, name, score in result.gaps:
-        rows.append([Paragraph(
-            f"&#9656; <b>{code}</b> - {name} ({score}/5)",
-            styles["Gap"],
-        )])
+        line = f"&#9656; <b>{code}</b> - {name} ({score}/5)"
+        insight = zones_insights.get(code)
+        if insight:
+            line += f"<br/><font size=\"8\">{insight}</font>"
+        rows.append([Paragraph(line, styles["Gap"])])
 
     table = Table(rows, colWidths=[8.5 * cm])
     table.setStyle(TableStyle([
@@ -331,7 +342,7 @@ def generate_flash_pdf(
     radar_img = Image(io.BytesIO(radar_png), width=8.5 * cm, height=8.5 * cm)
     radar_img.hAlign = "CENTER"
 
-    sg_block = _build_strengths_gaps_table(result, styles)
+    sg_block = _build_strengths_gaps_table(result, styles, verbatim_analysis)
 
     # Layout 2 colonnes : radar à gauche, forces+gaps à droite
     inner_table = Table(

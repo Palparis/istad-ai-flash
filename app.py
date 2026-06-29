@@ -581,12 +581,22 @@ def render_results(config: dict) -> None:
         "vous donne quand même une lecture relative de vos points d'appui et "
         "de vos chantiers."
     )
+    verbatim_analysis = st.session_state.get("verbatim_analysis")
+    forces_insights = verbatim_analysis.forces_insights if verbatim_analysis else {}
+    zones_insights = verbatim_analysis.zones_insights if verbatim_analysis else {}
+
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("### ✅ Vos forces")
         if result.strengths:
             for code, name, score in result.strengths:
-                st.success(f"**{code}** - {name} ({score}/5)")
+                insight = forces_insights.get(code)
+                if insight:
+                    st.success(
+                        f"**{code}** - {name} ({score}/5)\n\n{insight}"
+                    )
+                else:
+                    st.success(f"**{code}** - {name} ({score}/5)")
         else:
             st.info(
                 "Aucun axe ne ressort en force marquée - terrain d'opportunité large."
@@ -594,7 +604,13 @@ def render_results(config: dict) -> None:
     with c2:
         st.markdown("### 🎯 Zones de progrès prioritaires")
         for code, name, score in result.gaps:
-            st.error(f"**{code}** - {name} ({score}/5)")
+            insight = zones_insights.get(code)
+            if insight:
+                st.error(
+                    f"**{code}** - {name} ({score}/5)\n\n{insight}"
+                )
+            else:
+                st.error(f"**{code}** - {name} ({score}/5)")
 
     st.divider()
 

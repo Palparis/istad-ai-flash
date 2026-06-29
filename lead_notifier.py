@@ -162,10 +162,22 @@ def _build_lead_email_html(
     """Construit le corps HTML du mail récap."""
     now_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
 
+    forces_insights = verbatim_analysis.forces_insights if verbatim_analysis else {}
+    zones_insights = verbatim_analysis.zones_insights if verbatim_analysis else {}
+
+    def _li_with_insight(code: str, name: str, score: int, insight: str | None) -> str:
+        head = f"<b>{code}</b> - {name} ({score}/5)"
+        if insight:
+            return (
+                f"<li style='margin-bottom: 8px;'>{head}"
+                f"<br/><span style='color: #555; font-size: 13px;'>{insight}</span></li>"
+            )
+        return f"<li>{head}</li>"
+
     # Forces
     if result.strengths:
         strengths_html = "".join(
-            f"<li><b>{code}</b> - {name} ({score}/5)</li>"
+            _li_with_insight(code, name, score, forces_insights.get(code))
             for code, name, score in result.strengths
         )
     else:
@@ -173,7 +185,7 @@ def _build_lead_email_html(
 
     # Zones de progrès
     gaps_html = "".join(
-        f"<li><b>{code}</b> - {name} ({score}/5)</li>"
+        _li_with_insight(code, name, score, zones_insights.get(code))
         for code, name, score in result.gaps
     )
 
