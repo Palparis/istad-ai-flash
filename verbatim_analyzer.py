@@ -204,12 +204,19 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
         client = Anthropic(api_key=api_key)
         message = client.messages.create(
             model=model,
-            max_tokens=1024,
+            max_tokens=3000,
             temperature=0,
             system=_build_system_prompt(),
             messages=[{"role": "user", "content": _build_user_prompt(result)}],
         )
         raw_text = message.content[0].text
+        stop_reason = getattr(message, "stop_reason", None)
+        if stop_reason and stop_reason != "end_turn":
+            logger.warning(
+                "Reponse LLM interrompue (stop_reason=%s). "
+                "Augmenter max_tokens si recurrent.",
+                stop_reason,
+            )
 
         # Estimation du coût (USD vers EUR approximatif)
         input_tokens = message.usage.input_tokens
@@ -235,7 +242,11 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
         diss_ancres = _coerce_str_list(parsed.get("dissonances_ancres"))
 
         if not commentaire:
-            logger.warning("Commentaire LLM vide ou non parseable.")
+            logger.warning(
+                "Commentaire LLM vide ou non parseable. "
+                "Reponse brute (500 premiers chars): %r",
+                raw_text[:500] if raw_text else "(vide)",
+            )
             return None
 
         return VerbatimAnalysis(
