@@ -192,8 +192,9 @@ Pour les insights forces et zones_progres :
 
 Contraintes critiques :
 - **Cohérence visuelle** : le commentaire doit citer les axes listés dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus, pas en désigner d'autres. Le répondant ne doit pas avoir l'impression que le commentaire parle d'un autre audit que celui qu'il voit à l'écran.
-- N'utilise QUE des informations présentes dans les verbatims libres et les scores. Ne déduis pas d'éléments génériques sans base dans les données.
-- Si un axe a un verbatim "(non rempli)", ne mentionne pas son verbatim mais base-toi sur le score.
+- N'utilise QUE des informations présentes dans les verbatims libres, les scores et le stack IA déclaré. Ne déduis pas d'éléments génériques sans base dans les données.
+- Si un axe a un verbatim "(non rempli)", ne mentionne pas son verbatim mais base-toi sur le score, l'ancre choisie et le stack IA déclaré.
+- **Cas sans aucun verbatim libre** : le commentaire personnalisé reste possible et précieux à partir des scores, des ancres et du stack IA. Les dissonances Type A (entre verbatims) et Type B (verbatim vs ancre) seront vides dans ce cas, mais Type C (entre ancres) doit toujours être instruit.
 - Pour le TYPE C : ne flag que les écarts d'au moins 2 points entre axes thématiquement liés (ex : Vision et Organisation, Adoption et Talent).
 - Pas de bloc markdown ```. JSON brut commençant par {{ et terminant par }}.
 - Le commentaire doit servir au répondant (lui apporter de la valeur) et pas seulement à un commercial."""
@@ -225,11 +226,12 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
         timeout, etc.). En cas de None, l'app continue avec l'audit standard
         sans commentaire personnalisé.
     """
-    # Vérifier qu'il y a au moins quelques verbatims à analyser
-    nb_verbatims = sum(1 for v in result.text_inputs.values() if v.strip())
-    if nb_verbatims == 0:
-        logger.info("Aucun verbatim libre fourni, analyse LLM skip.")
-        return None
+    # NOTE : on n'exige plus de verbatims pour lancer l'analyse. Même sans
+    # verbatim, Claude peut produire un commentaire sur les patterns de
+    # score, détecter des dissonances Type C (cross-ancres) et enrichir
+    # les insights forces/zones avec le stack IA déclaré au multiselect.
+    # Le coût marginal (~0.005 EUR) reste couvert par les caps quotidiens
+    # et mensuels gérés par cost_guard.py.
 
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
     if not api_key:
