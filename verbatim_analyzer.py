@@ -129,9 +129,16 @@ def _build_user_prompt(result: FlashResult) -> str:
             "verbatim_libre": verbatim or "(non rempli)",
         })
 
+    forces_affichees = [f"{code} - {name} ({score}/5)" for code, name, score in result.strengths]
+    zones_affichees = [f"{code} - {name} ({score}/5)" for code, name, score in result.gaps]
+
     return f"""Tu analyses l'audit flash maturité IA de l'organisation **{result.organization}**, répondant en rôle de **{result.role}**.
 
 Score global : **{result.global_score:.2f} / 5** (niveau {result.level} - {result.level_name}).
+
+L'écran de résultats affiche déjà au répondant :
+- **Vos forces** : {forces_affichees if forces_affichees else "(aucune force notable affichée)"}
+- **Zones de progrès prioritaires** : {zones_affichees if zones_affichees else "(aucun gap explicite affiché)"}
 
 Voici les 8 axes avec le score choisi et le verbatim libre du répondant :
 
@@ -142,7 +149,7 @@ Voici les 8 axes avec le score choisi et le verbatim libre du répondant :
 Réponds en JSON strict avec exactement cette structure :
 
 {{
-  "commentaire_personnalise": "<3 paragraphes courts (3-4 phrases chacun). Paragraphe 1 : ce que le profil global révèle (ancres + verbatims) sur la maturité IA de l'organisation. Paragraphe 2 : 2-3 zones de progrès tangibles déductibles des verbatims (pas généralistes - vraiment basé sur ce qui est écrit). Paragraphe 3 : 1-2 actions concrètes que cette organisation pourrait engager dans les 90 jours. Ton senior cabinet, impersonnel, sans formules marketing.>",
+  "commentaire_personnalise": "<2 paragraphes courts (2-3 phrases chacun, environ 250-350 mots au total). Paragraphe 1 : ce que le profil global révèle (forces et zones de progrès) sur la maturité IA de l'organisation. **Tu dois explicitement nommer les axes 'forces' et 'zones de progrès' listés ci-dessus** pour rester cohérent avec ce que voit le répondant à l'écran. Tu peux nuancer ou enrichir avec les verbatims, mais sans contredire la liste. Paragraphe 2 : 1-2 actions concrètes que cette organisation pourrait engager dans les 90 jours, ancrées sur les zones de progrès identifiées. Ton senior cabinet, impersonnel, sans formules marketing.>",
 
   "dissonances_verbatims": ["<TYPE A - liste de 0 à 3 dissonances entre verbatims libres. Format : '<axe X> vs <axe Y> : <explicitation de l'écart en 15-25 mots>'. Liste vide [] si aucune contradiction notable.>"],
 
@@ -152,6 +159,7 @@ Réponds en JSON strict avec exactement cette structure :
 }}
 
 Contraintes critiques :
+- **Cohérence visuelle** : le commentaire doit citer les axes listés dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus, pas en désigner d'autres. Le répondant ne doit pas avoir l'impression que le commentaire parle d'un autre audit que celui qu'il voit à l'écran.
 - N'utilise QUE des informations présentes dans les verbatims libres et les scores. Ne déduis pas d'éléments génériques sans base dans les données.
 - Si un axe a un verbatim "(non rempli)", ne mentionne pas son verbatim mais base-toi sur le score.
 - Pour le TYPE C : ne flag que les écarts d'au moins 2 points entre axes thématiquement liés (ex : Vision et Organisation, Adoption et Talent).
