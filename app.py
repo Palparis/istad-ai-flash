@@ -753,7 +753,9 @@ def render_results(config: dict) -> None:
 
 **Opportunités prioritaires** : axes où vous avez score 1 ou 2. Ce sont les leviers à activer en priorité. Une sévérité haute indique un poids fort dans le framework combiné avec un score bas.
 
-**Repère de marché** : selon nos observations, la maturité IA moyenne des ETI françaises se situe entre niveau 2 et 3. Atteindre le niveau 4 demande généralement 18 à 36 mois de transformation structurée.
+**Repère de marché** : selon nos observations, la maturité IA moyenne des entreprises françaises se situe entre niveau 2 et 3. Atteindre le niveau 4 demande généralement 18 à 36 mois de transformation structurée.
+
+*Cette échelle de maturité est construite par IstadAi en s'inspirant des modèles CMMI et Gartner AI Maturity, calibrée sur le retour terrain.*
             """
         )
 

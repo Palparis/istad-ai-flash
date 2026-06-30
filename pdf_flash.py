@@ -540,7 +540,7 @@ def generate_flash_pdf(
         "<b>Méthodologie IstadAi</b> - Audit flash construit sur le framework "
         "propriétaire IstadAi Maturity Model (8 axes / 80 items / 480 ancres "
         "comportementales). Sources théoriques : Harvard AI for Leaders (M1-M4), "
-        "Gartner AI Maturity Model, expérience cabinet terrain ETI. Scoring 100 % "
+        "Gartner AI Maturity Model, expérience cabinet terrain. Scoring 100 % "
         "déterministe et traçable - à scores identiques, conclusions identiques. "
         "L'analyse qualitative optionnelle des verbatims libres (si consentement "
         "accordé) est réalisée par Claude (Anthropic) en tant que sous-traitant, "

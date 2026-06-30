@@ -2,7 +2,8 @@
 # IstadAi - Audit Flash Maturité IA
 # 10 questions situationnelles (8 axes + 2 transverses)
 # Format : champ texte libre optionnel (non scoré) + auto-évaluation 5 ancres
-# Échelle CMMI : 1 Initial / 2 Aware / 3 Defined / 4 Managed / 5 Optimized
+# Échelle IstadAi Maturity Model (5 niveaux inspirés de CMMI + Gartner) :
+# 1 Initial / 2 Aware / 3 Defined / 4 Managed / 5 Optimized
 # Compatible avec framework_axes.yaml (agent-audit-maturite)
 
 version: "1.0.0"

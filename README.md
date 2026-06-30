@@ -10,7 +10,7 @@ immédiate. Lien partageable pour test marché.
 ```
 agent-audit-flash/
 ├── app.py                  # Streamlit app (4 vues : intro / questionnaire / gate email / résultats)
-├── questions_flash.yaml    # 10 questions + ancres CMMI + wording RGPD
+├── questions_flash.yaml    # 10 questions + ancres IstadAi Maturity Model (inspirees CMMI+Gartner) + wording RGPD
 ├── scoring_flash.py        # Logique scoring (FlashResult dataclass)
 ├── pdf_flash.py            # PDF synthèse 1 page (reportlab + matplotlib)
 ├── lead_notifier.py        # Envoi notification email à chaque lead capturé
@@ -87,7 +87,7 @@ L'app se lance sur `http://localhost:8501`.
 1. **Intro** : nom organisation + rôle + case consentement (RGPD pré-cadré)
 2. **Questionnaire** : 9 questions scorées (8 axes + 1 transverse) + 1 contextuelle
    - Champ libre optionnel (200 chars max, non scoré, apparaît dans le PDF)
-   - Auto-évaluation 5 ancres CMMI (obligatoire, scoré)
+   - Auto-évaluation 5 ancres IstadAi Maturity Model (obligatoire, scoré)
 3. **Gate email** : prénom + nom + email + téléphone + consentement recontact
    - Email envoyé automatiquement à IstadAi avec PDF en PJ
    - Reply-To préremplie avec l'email du lead (réponse directe possible)
@@ -96,7 +96,7 @@ L'app se lance sur `http://localhost:8501`.
 ## Cohérence avec l'agent #2 (audit complet)
 
 - Mêmes axes (V/P/D/O/T/A/M/G) - même framework propriétaire IstadAi
-- Mêmes ancres CMMI (1 Initial → 5 Optimized)
+- Mêmes ancres IstadAi Maturity Model (1 Initial → 5 Optimized, inspirees CMMI+Gartner)
 - Mêmes couleurs niveau (rouge → vert)
 - Même style PDF (typographie, footer paginé)
 
