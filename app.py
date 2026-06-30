@@ -174,8 +174,10 @@ _inject_istad_cubes()
 # Helpers session
 # ============================================================
 
-@st.cache_resource
 def get_questions_config() -> dict:
+    # Pas de cache : la config YAML est petite (qqs KB) et l'absence de cache
+    # garantit que toute modification du YAML est prise en compte au prochain
+    # rerun (sans necessiter un reboot manuel de Streamlit Cloud).
     return load_questions(Path(__file__).parent / "questions_flash.yaml")
 
 
