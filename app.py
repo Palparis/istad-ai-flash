@@ -143,6 +143,34 @@ st.markdown("""
 
 
 # ============================================================
+# Cubes lateraux (logos Istada officiels) - injectes globalement
+# ============================================================
+# Chargés une fois en base64 et réinjectés sur chaque rerun. Comme
+# ils sont position:fixed, ils s'affichent identiquement sur toutes
+# les vues (intro, questionnaire, gate email, résultats).
+
+def _inject_istad_cubes() -> None:
+    import base64
+    assets = Path(__file__).parent / "assets"
+    html = ""
+    for cls, fname in (("istad-cube-left", "cube-couleur.png"),
+                       ("istad-cube-right", "cube-bw.png")):
+        img_path = assets / fname
+        if img_path.exists():
+            with open(img_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("ascii")
+            html += (
+                f'<img class="{cls}" '
+                f'src="data:image/png;base64,{b64}" alt="">'
+            )
+    if html:
+        st.markdown(html, unsafe_allow_html=True)
+
+
+_inject_istad_cubes()
+
+
+# ============================================================
 # Helpers session
 # ============================================================
 
@@ -208,24 +236,9 @@ def _scroll_to_top() -> None:
 def render_intro(config: dict) -> None:
     assets = Path(__file__).parent / "assets"
 
-    # Cubes lateraux (logos Istada officiels extraits des .ai).
-    # Encodes en base64 et injectes en HTML inline pour fiabilite max.
-    import base64
-    cubes_html = ""
-    for cls, fname in (("istad-cube-left", "cube-couleur.png"),
-                       ("istad-cube-right", "cube-bw.png")):
-        img_path = assets / fname
-        if img_path.exists():
-            with open(img_path, "rb") as f:
-                b64 = base64.b64encode(f.read()).decode("ascii")
-            cubes_html += (
-                f'<img class="{cls}" '
-                f'src="data:image/png;base64,{b64}" alt="">'
-            )
-    if cubes_html:
-        st.markdown(cubes_html, unsafe_allow_html=True)
-
     # Banniere photo montagne au format hero (970x180, ratio ~5.4:1).
+    # Les cubes lateraux sont injectes globalement au demarrage du script
+    # (cf. _inject_istad_cubes) pour qu'ils apparaissent sur toutes les vues.
     for candidate in ("photo-montagne-hero.jpg", "photo-montagne-banner.jpg",
                       "Photo montagne.jpg"):
         photo = assets / candidate
@@ -435,7 +448,7 @@ def render_email_gate(config: dict) -> None:
     _scroll_to_top()
     result = st.session_state["result"]
 
-    st.title("Votre audit est terminé")
+    st.title("Votre audit flash est terminé")
     st.markdown(
         '<div class="istad-tagline">Une dernière étape avant de découvrir vos résultats.</div>',
         unsafe_allow_html=True,
