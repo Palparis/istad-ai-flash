@@ -775,7 +775,17 @@ def render_results(config: dict) -> None:
             "Anthropic ne réutilise pas les inputs/outputs pour entraîner ses "
             "modèles (politique contractuelle standard)."
         )
-        st.info(analysis.commentaire_personnalise)
+        # Normaliser les paragraphes : Claude renvoie parfois "\n" et parfois
+        # "\n\n" entre paragraphes. On split sur toute sequence de newlines
+        # et on rejoint avec "\n\n" (paragraphes Markdown standard) pour
+        # garantir un saut visible dans st.info().
+        import re
+        paragraphs = [
+            p.strip()
+            for p in re.split(r"\n+", analysis.commentaire_personnalise)
+            if p.strip()
+        ]
+        st.info("\n\n".join(paragraphs))
 
         # Cas d'usage IA recommandés (basés sur Q2 multiselect domaines + Q3 stack IA)
         if analysis.cas_usage_recommandes:
