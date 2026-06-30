@@ -54,18 +54,42 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        .main .block-container { padding-top: 1.2rem; max-width: 820px; }
+        /* Compactage page d'accueil pour tenir dans le viewport */
+        .main .block-container {
+            padding-top: 0.6rem;
+            padding-bottom: 1rem;
+            max-width: 820px;
+        }
         /* Palette IstadAi (charte Istada) :
            bleu marine #2E3A66 pour titres, bleu #6270B4 pour accents */
-        h1 { color: #2E3A66; font-weight: 700; }
-        h2, h3 { color: #2E3A66; margin-top: 1.5rem; }
+        h1 {
+            color: #2E3A66; font-weight: 700;
+            font-size: 1.9rem; margin-top: 0.5rem; margin-bottom: 0.3rem;
+        }
+        h2 { color: #2E3A66; margin-top: 0.8rem; margin-bottom: 0.4rem; }
+        h3 { color: #2E3A66; margin-top: 0.8rem; margin-bottom: 0.4rem; }
+        p { margin-bottom: 0.4rem; }
         .stRadio label { font-size: 0.95rem; }
         .istad-tagline {
             color: #6270B4; font-size: 0.95rem; font-weight: 500;
-            margin-top: -0.5rem; margin-bottom: 1.5rem;
+            margin-top: -0.3rem; margin-bottom: 0.8rem;
         }
-        /* Image bannière : coins arrondis discrets */
-        .stImage img { border-radius: 6px; }
+        /* Image bannière : coins arrondis discrets, taille contrainte */
+        .stImage img {
+            border-radius: 6px;
+            max-height: 220px; width: 100%; object-fit: cover;
+            object-position: center 35%;
+        }
+        /* Carres decoratifs lateraux inspires de la charte (aplats sans degrade) */
+        body::before, body::after {
+            content: ""; position: fixed; top: 50%; width: 60px; height: 60px;
+            transform: translateY(-50%); z-index: -1; opacity: 0.85;
+        }
+        body::before { left: 28px; background-color: #6270B4; }
+        body::after { right: 28px; background-color: #E30613; }
+        @media (max-width: 1100px) {
+            body::before, body::after { display: none; }
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -134,10 +158,16 @@ def _scroll_to_top() -> None:
 # ============================================================
 
 def render_intro(config: dict) -> None:
-    # Banniere panoramique montagne (identite IstadAi inspiree Istada)
-    banner_path = Path(__file__).parent / "assets" / "photo-montagne-banner.jpg"
-    if banner_path.exists():
-        st.image(str(banner_path), width="stretch")
+    # Banniere photo montagne (identite IstadAi inspiree Istada).
+    # On prefere la photo complete, contrainte en hauteur par le CSS
+    # (.stImage img max-height + object-fit cover) pour tenir dans le
+    # viewport. Fallback sur le crop si la complete n'est pas la.
+    assets = Path(__file__).parent / "assets"
+    photo = assets / "Photo montagne.jpg"
+    if not photo.exists():
+        photo = assets / "photo-montagne-banner.jpg"
+    if photo.exists():
+        st.image(str(photo), width="stretch")
 
     st.title("Audit Flash Maturité IA")
     st.markdown(
