@@ -175,16 +175,11 @@ questions:
 # Texte de consentement court (affiché par défaut)
 # ============================================================
 consent_short: |
-  Cet audit est **gratuit**. Le scoring est **déterministe** : à réponses
-  identiques, conclusions identiques.
-
-  À la fin du questionnaire, vos coordonnées vous seront demandées pour
-  accéder à votre synthèse. Elles sont conservées **12 mois maximum** et
-  **jamais partagées** avec un tiers.
-
-  Une analyse qualitative par **Claude (Anthropic)** est proposée en option,
-  **désactivable à tout moment**. Elle ne nourrit pas l'entraînement des
-  modèles.
+  Audit **gratuit**, scoring **déterministe**. Vos coordonnées vous seront
+  demandées en fin de questionnaire pour accéder à votre synthèse
+  (conservées 12 mois, jamais partagées). Option d'analyse qualitative
+  par **Claude (Anthropic)**, désactivable à tout moment, sans
+  entraînement des modèles.
 
 # ============================================================
 # Texte de consentement long (déplié dans un expander)

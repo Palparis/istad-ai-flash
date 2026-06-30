@@ -85,21 +85,40 @@ def _scroll_to_top() -> None:
 
     Streamlit conserve par défaut la position de scroll entre les reruns,
     ce qui donne une UX cassée quand on passe d'une vue courte (intro)
-    à une vue longue (questionnaire). Ce hack injecte un petit script JS
-    qui scrolle au top dès que le composant est monté.
+    à une vue longue (questionnaire). Ce hack tente plusieurs sélecteurs
+    (selon la version de Streamlit Cloud les DOM diffèrent) et plusieurs
+    timings (Streamlit re-render après le mount initial).
     """
     import streamlit.components.v1 as components
     components.html(
         """
         <script>
-            setTimeout(function() {
-                const doc = window.parent.document;
-                const main = doc.querySelector('section.main')
-                          || doc.querySelector('div.main')
-                          || doc.querySelector('.stApp');
-                if (main) main.scrollTo({top: 0, behavior: 'instant'});
-                window.parent.scrollTo({top: 0, behavior: 'instant'});
-            }, 50);
+            function istadScrollTop() {
+                try {
+                    const doc = window.parent.document;
+                    const targets = [
+                        doc.querySelector('section.main'),
+                        doc.querySelector('div.main'),
+                        doc.querySelector('.stApp'),
+                        doc.querySelector('[data-testid="stAppViewContainer"]'),
+                        doc.querySelector('[data-testid="stMain"]'),
+                        doc.documentElement,
+                        doc.body,
+                    ];
+                    for (const t of targets) {
+                        if (t && t.scrollTo) {
+                            t.scrollTo({top: 0, behavior: 'instant'});
+                        }
+                    }
+                    if (window.parent && window.parent.scrollTo) {
+                        window.parent.scrollTo({top: 0, behavior: 'instant'});
+                    }
+                } catch (e) { /* iframes cross-origin, on ignore */ }
+            }
+            istadScrollTop();
+            setTimeout(istadScrollTop, 100);
+            setTimeout(istadScrollTop, 300);
+            setTimeout(istadScrollTop, 700);
         </script>
         """,
         height=0,
@@ -118,7 +137,7 @@ def render_intro(config: dict) -> None:
         unsafe_allow_html=True,
     )
 
-    st.markdown("### Ce que vous allez recevoir")
+    st.markdown("**Ce que vous allez recevoir**")
     st.markdown(
         "- Votre **score global** sur 5 et votre **niveau de maturité** "
         "(Initial à Optimized)\n"
@@ -127,7 +146,6 @@ def render_intro(config: dict) -> None:
         "- Un **PDF de synthèse**"
     )
 
-    st.markdown("### Avant de démarrer")
     short_text = config.get("consent_short", "")
     full_text = config.get("consent_text", "")
     if short_text:
