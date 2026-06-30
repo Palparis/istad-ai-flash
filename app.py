@@ -120,22 +120,26 @@ st.markdown("""
         [data-testid="stSelectbox"] label { font-size: 0.85rem !important; }
         /* Carres decoratifs lateraux (aplats charte Istada).
            Gauche : carre couleur (rouge Istada signature).
-           Droite : carre noir et blanc (diagonale aplats juxtaposes). */
-        body::before, body::after {
+           Droite : carre noir et blanc (diagonale aplats juxtaposes).
+           Attaches a .stApp avec z-index positif + pointer-events:none
+           pour s'afficher au-dessus du fond blanc Streamlit sans bloquer
+           l'interaction utilisateur. */
+        .stApp::before, .stApp::after {
             content: ""; position: fixed; top: 50%; width: 64px; height: 64px;
-            transform: translateY(-50%); z-index: -1; opacity: 0.9;
+            transform: translateY(-50%); z-index: 1000; opacity: 0.9;
+            pointer-events: none;
         }
-        body::before {
+        .stApp::before {
             left: 28px;
             background-color: #E30613;
         }
-        body::after {
+        .stApp::after {
             right: 28px;
             background: linear-gradient(135deg, #2D2D2D 50%, #FFFFFF 50%);
             border: 1px solid #2D2D2D;
         }
         @media (max-width: 1100px) {
-            body::before, body::after { display: none; }
+            .stApp::before, .stApp::after { display: none; }
         }
     </style>
 """, unsafe_allow_html=True)
