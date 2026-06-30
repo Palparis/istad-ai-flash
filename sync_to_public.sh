@@ -46,13 +46,15 @@ rsync -av --delete \
     --exclude='Assets/' \
     "$SRC_DIR/" "$PUBLIC_DIR/"
 
-# Cleanup explicite de fichiers prives Istada qui auraient pu fuiter
+# Cleanup explicite des fichiers prives Istada qui auraient pu fuiter
 # lors de syncs precedentes (avant l'ajout des exclusions).
-# On ne touche JAMAIS .git/ - protege par l'absence de --delete-excluded.
+# IMPORTANT : on cible les FICHIERS uniquement, jamais le DOSSIER assets
+# entier - macOS est case-insensitive et un 'rm -rf Assets' effacerait
+# aussi le dossier 'assets/' minuscule qu'on vient de creer.
 cd "$PUBLIC_DIR"
 rm -f "assets/Photo montagne.jpg" "assets/Charte Graphique.pptx" 2>/dev/null || true
-rm -f assets/cube_*.png assets/cubeNB_*.png 2>/dev/null || true
-rm -rf "Assets" 2>/dev/null || true
+rm -f assets/cube_blanc_*.png assets/cube_margeblanche.png 2>/dev/null || true
+rm -f assets/cube_transp_HD.png assets/cubeNB_transp_160px.png 2>/dev/null || true
 
 # 3. Commit + push
 cd "$PUBLIC_DIR"
