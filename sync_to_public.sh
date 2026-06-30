@@ -43,7 +43,16 @@ rsync -av --delete \
     --exclude='assets/Charte Graphique.pptx' \
     --exclude='assets/cube_*.png' \
     --exclude='assets/cubeNB_*.png' \
+    --exclude='Assets/' \
     "$SRC_DIR/" "$PUBLIC_DIR/"
+
+# Cleanup explicite de fichiers prives Istada qui auraient pu fuiter
+# lors de syncs precedentes (avant l'ajout des exclusions).
+# On ne touche JAMAIS .git/ - protege par l'absence de --delete-excluded.
+cd "$PUBLIC_DIR"
+rm -f "assets/Photo montagne.jpg" "assets/Charte Graphique.pptx" 2>/dev/null || true
+rm -f assets/cube_*.png assets/cubeNB_*.png 2>/dev/null || true
+rm -rf "Assets" 2>/dev/null || true
 
 # 3. Commit + push
 cd "$PUBLIC_DIR"
