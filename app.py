@@ -43,7 +43,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 st.set_page_config(
     page_title="IstadAi - Audit Flash Maturité IA",
-    page_icon="🎯",
+    page_icon=str(Path(__file__).parent / "assets" / "cube-couleur.png"),
     layout="centered",  # centré pour effet "tunnel"
     initial_sidebar_state="collapsed",
 )
