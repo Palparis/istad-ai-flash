@@ -118,13 +118,22 @@ st.markdown("""
         [data-testid="stForm"] { padding: 0.5rem !important; }
         [data-testid="stTextInput"] label,
         [data-testid="stSelectbox"] label { font-size: 0.85rem !important; }
-        /* Carres decoratifs lateraux (aplats charte) */
+        /* Carres decoratifs lateraux (aplats charte Istada).
+           Gauche : carre couleur (rouge Istada signature).
+           Droite : carre noir et blanc (diagonale aplats juxtaposes). */
         body::before, body::after {
-            content: ""; position: fixed; top: 50%; width: 56px; height: 56px;
-            transform: translateY(-50%); z-index: -1; opacity: 0.85;
+            content: ""; position: fixed; top: 50%; width: 64px; height: 64px;
+            transform: translateY(-50%); z-index: -1; opacity: 0.9;
         }
-        body::before { left: 24px; background-color: #6270B4; }
-        body::after { right: 24px; background-color: #E30613; }
+        body::before {
+            left: 28px;
+            background-color: #E30613;
+        }
+        body::after {
+            right: 28px;
+            background: linear-gradient(135deg, #2D2D2D 50%, #FFFFFF 50%);
+            border: 1px solid #2D2D2D;
+        }
         @media (max-width: 1100px) {
             body::before, body::after { display: none; }
         }
