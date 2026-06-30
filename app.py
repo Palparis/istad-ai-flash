@@ -54,43 +54,71 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        /* Compactage page d'accueil pour tenir dans le viewport sans scroll */
-        .main .block-container {
-            padding-top: 0.3rem !important;
-            padding-bottom: 1rem !important;
-            max-width: 820px;
-        }
-        /* Palette IstadAi (charte Istada) :
-           bleu marine #2E3A66 pour titres, bleu #6270B4 pour accents */
-        h1 {
-            color: #2E3A66 !important; font-weight: 700;
-            font-size: 1.7rem !important;
-            margin-top: 0.3rem !important; margin-bottom: 0.2rem !important;
+        /* Compactage agressif pour tenir tout dans le viewport, sans scroll.
+           Selecteurs Streamlit modernes (data-testid) + spécificité haute. */
+        [data-testid="stAppViewContainer"] [data-testid="stMain"] {
             padding-top: 0 !important;
         }
-        h2, h3 {
-            color: #2E3A66 !important;
-            margin-top: 0.5rem !important; margin-bottom: 0.3rem !important;
+        [data-testid="stMain"] .block-container,
+        [data-testid="stMainBlockContainer"],
+        .main .block-container {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+            max-width: 860px;
         }
-        p { margin-bottom: 0.3rem !important; }
-        ul, ol { margin-top: 0.2rem !important; margin-bottom: 0.3rem !important; }
-        li { margin-bottom: 0.1rem !important; }
+        /* Cacher le header Streamlit (toolbar haut) pour gagner ~50px */
+        [data-testid="stHeader"] { display: none !important; }
+        [data-testid="stToolbar"] { display: none !important; }
+        /* Palette IstadAi (charte Istada) */
+        h1, [data-testid="stMain"] h1 {
+            color: #2E3A66 !important; font-weight: 700 !important;
+            font-size: 1.6rem !important;
+            margin: 0.4rem 0 0.1rem 0 !important;
+            padding: 0 !important; line-height: 1.2 !important;
+        }
+        h2, [data-testid="stMain"] h2,
+        h3, [data-testid="stMain"] h3 {
+            color: #2E3A66 !important;
+            margin: 0.4rem 0 0.2rem 0 !important;
+            padding: 0 !important;
+        }
+        [data-testid="stMain"] p { margin-bottom: 0.25rem !important; }
+        [data-testid="stMain"] ul,
+        [data-testid="stMain"] ol {
+            margin: 0.15rem 0 0.3rem 0 !important;
+            padding-left: 1.2rem !important;
+        }
+        [data-testid="stMain"] li {
+            margin-bottom: 0.05rem !important;
+            line-height: 1.35 !important;
+        }
         .stRadio label { font-size: 0.95rem; }
         .istad-tagline {
-            color: #6270B4; font-size: 0.9rem; font-weight: 500;
-            margin-top: -0.4rem; margin-bottom: 0.5rem;
+            color: #6270B4 !important; font-size: 0.9rem; font-weight: 500;
+            margin: -0.2rem 0 0.4rem 0 !important;
         }
-        /* Banniere : coins arrondis discrets */
+        /* Banniere */
+        [data-testid="stImage"] { margin: 0 !important; }
         .stImage img { border-radius: 6px; }
-        /* Reduction marges autour des blocs Streamlit */
-        [data-testid="stAlert"] {
+        /* Info_box (st.info) compacte */
+        [data-testid="stAlert"],
+        [data-testid="stAlertContainer"] {
             padding: 0.5rem 0.8rem !important;
             margin: 0.3rem 0 !important;
         }
+        [data-testid="stAlert"] p { margin: 0 !important; font-size: 0.9rem; }
+        /* Expander compact */
         [data-testid="stExpander"] {
             margin: 0.2rem 0 !important;
         }
-        /* Carres decoratifs lateraux (aplats sans degrade, conforme charte) */
+        [data-testid="stExpander"] details summary {
+            padding: 0.4rem 0.8rem !important;
+        }
+        /* Form compact */
+        [data-testid="stForm"] { padding: 0.5rem !important; }
+        [data-testid="stTextInput"] label,
+        [data-testid="stSelectbox"] label { font-size: 0.85rem !important; }
+        /* Carres decoratifs lateraux (aplats charte) */
         body::before, body::after {
             content: ""; position: fixed; top: 50%; width: 56px; height: 56px;
             transform: translateY(-50%); z-index: -1; opacity: 0.85;
