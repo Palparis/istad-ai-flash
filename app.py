@@ -119,17 +119,22 @@ st.markdown("""
         [data-testid="stTextInput"] label,
         [data-testid="stSelectbox"] label { font-size: 0.85rem !important; }
         /* Cubes lateraux : logos Istada officiels (extraits .ai par PAL).
-           Charges via le composant Streamlit dans render_intro pour eviter
-           la complexite des background-image en CSS (chemin relatif app
-           sur Streamlit Cloud). Voir cube-couleur.png et cube-bw.png. */
+           Centres horizontalement entre le bord de l'ecran et le bloc
+           central (max-width 860px du block-container).
+           Formule : (viewport - contenu)/2 = marge laterale ;
+                     /2 = centre de marge ; - largeur_cube/2 = position. */
         .istad-cube-left, .istad-cube-right {
             position: fixed; top: 50%;
             width: 96px; height: auto;
             transform: translateY(-50%); z-index: 1000;
             pointer-events: none;
         }
-        .istad-cube-left { left: 24px; }
-        .istad-cube-right { right: 24px; }
+        .istad-cube-left {
+            left: calc((100vw - 860px) / 4 - 48px);
+        }
+        .istad-cube-right {
+            right: calc((100vw - 860px) / 4 - 48px);
+        }
         @media (max-width: 1100px) {
             .istad-cube-left, .istad-cube-right { display: none; }
         }
