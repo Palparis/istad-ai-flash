@@ -111,7 +111,7 @@ def _scroll_to_top() -> None:
 # ============================================================
 
 def render_intro(config: dict) -> None:
-    st.title("🎯 Audit Flash Maturité IA")
+    st.title("Audit Flash Maturité IA")
     st.markdown(
         '<div class="istad-tagline">Pré-diagnostic IA en 10 questions, '
         "5 à 10 minutes. Par IstadAi.</div>",
@@ -124,7 +124,7 @@ def render_intro(config: dict) -> None:
         "(Initial à Optimized)\n"
         "- Un **radar 8 axes** couvrant stratégie, exécution et gouvernance\n"
         "- Vos **forces** et vos **zones de progrès**, axe par axe\n"
-        "- Un **PDF de synthèse** à partager en COMEX"
+        "- Un **PDF de synthèse**"
     )
 
     st.markdown("### Avant de démarrer")
@@ -156,7 +156,9 @@ def render_intro(config: dict) -> None:
             value=False,
         )
         submitted = st.form_submit_button(
-            "Commencer l'audit →", type="primary", use_container_width=True,
+            "Commencer l'audit flash Maturité IA",
+            type="primary",
+            use_container_width=True,
         )
 
     if submitted:
@@ -178,7 +180,7 @@ def render_intro(config: dict) -> None:
 
 def render_questionnaire(config: dict) -> None:
     _scroll_to_top()
-    st.title("🎯 Audit Flash Maturité IA")
+    st.title("Audit Flash Maturité IA")
     st.caption(
         f"Organisation : **{st.session_state['organization']}**  ·  "
         f"Répondant : **{st.session_state['role']}**"
@@ -312,14 +314,14 @@ def render_email_gate(config: dict) -> None:
     _scroll_to_top()
     result = st.session_state["result"]
 
-    st.title("🎯 Votre audit est terminé")
+    st.title("Votre audit est terminé")
     st.markdown(
         '<div class="istad-tagline">Une dernière étape avant de découvrir vos résultats.</div>',
         unsafe_allow_html=True,
     )
 
     st.success(
-        f"✓ Questionnaire complété pour **{result.organization}**. "
+        f"Questionnaire complété pour **{result.organization}**. "
         f"Votre synthèse personnalisée est prête."
     )
 
@@ -389,7 +391,7 @@ def render_email_gate(config: dict) -> None:
                 "à Claude. Votre rapport contiendra alors uniquement le scoring "
                 "des ancres + le radar 8 axes."
                 + (
-                    f" ⚠️ Quota LLM atteint ({llm_reason}), case désactivée."
+                    f" Quota LLM atteint ({llm_reason}), case désactivée."
                     if not llm_available
                     else ""
                 )
@@ -503,7 +505,7 @@ def render_results(config: dict) -> None:
     _scroll_to_top()
     result = st.session_state["result"]
 
-    st.title("🎯 Vos résultats")
+    st.title("Vos résultats")
     st.caption(
         f"Organisation : **{result.organization}**  ·  "
         f"Répondant : **{result.role}**"
@@ -532,7 +534,7 @@ def render_results(config: dict) -> None:
         )
 
     # ── Encadré pédagogie 'Comment lire vos résultats' ──
-    with st.expander("ℹ️ Comment lire vos résultats", expanded=False):
+    with st.expander("Comment lire vos résultats", expanded=False):
         st.markdown(
             """
 **Niveau de maturité (échelle 1 à 5)** :
@@ -554,7 +556,7 @@ def render_results(config: dict) -> None:
     st.divider()
 
     # ── Radar ──
-    st.markdown("### 📊 Votre radar 8 axes")
+    st.markdown("### Votre radar 8 axes")
     render_radar_plotly(result)
 
     # ── Dissonance déclaratif vs réel ──
@@ -589,7 +591,7 @@ def render_results(config: dict) -> None:
         )
         if total_diss > 0:
             with st.expander(
-                f"⚠️ {total_diss} dissonance(s) détectée(s) - 3 types analysés",
+                f"{total_diss} dissonance(s) détectée(s), 3 types analysés",
                 expanded=False,
             ):
                 if analysis.dissonances_verbatims:
@@ -619,7 +621,7 @@ def render_results(config: dict) -> None:
 
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("### ✅ Vos forces")
+        st.markdown("### Vos forces")
         if result.strengths:
             for code, name, score in result.strengths:
                 insight = forces_insights.get(code)
@@ -634,7 +636,7 @@ def render_results(config: dict) -> None:
                 "Aucun axe ne ressort en force marquée - terrain d'opportunité large."
             )
     with c2:
-        st.markdown("### 🎯 Zones de progrès prioritaires")
+        st.markdown("### Zones de progrès prioritaires")
         for code, name, score in result.gaps:
             insight = zones_insights.get(code)
             if insight:
@@ -647,7 +649,7 @@ def render_results(config: dict) -> None:
     st.divider()
 
     # ── PDF download + CTA ──
-    st.markdown("### 📄 Téléchargez votre synthèse")
+    st.markdown("### Téléchargez votre synthèse")
     st.caption(
         "1 page A4, prête à partager en interne. Inclut votre score, "
         "votre radar, vos forces, vos zones de progrès, et vos apports qualitatifs."
@@ -661,7 +663,7 @@ def render_results(config: dict) -> None:
     c1, c2 = st.columns([1, 2])
     with c1:
         st.download_button(
-            label="⬇️ Télécharger le PDF",
+            label="Télécharger le PDF",
             data=pdf_bytes,
             file_name=filename,
             mime="application/pdf",
@@ -675,7 +677,7 @@ def render_results(config: dict) -> None:
 
     # ── CTA commercial ──
     cta = config["cta"]
-    st.markdown("### 💬 Pour aller plus loin")
+    st.markdown("### Pour aller plus loin")
 
     # On construit le mailto en encodant proprement subject et body via
     # urllib.parse.quote, puis on l'injecte en HTML pour eviter que le

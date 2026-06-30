@@ -262,7 +262,7 @@ def _build_strengths_gaps_table(
     rows.append([Paragraph("<b>Forces (axes &ge; 4 / 5)</b>", styles["Section"])])
     if result.strengths:
         for code, name, score in result.strengths:
-            line = f"&#10003; <b>{code}</b> - {name} ({score}/5)"
+            line = f"<b>{code}</b> - {name} ({score}/5)"
             insight = forces_insights.get(code)
             if insight:
                 line += f"<br/><font size=\"8\">{insight}</font>"
@@ -276,7 +276,7 @@ def _build_strengths_gaps_table(
     # Bloc Zones de progrès
     rows.append([Paragraph("<b>Zones de progrès prioritaires</b>", styles["Section"])])
     for code, name, score in result.gaps:
-        line = f"&#9656; <b>{code}</b> - {name} ({score}/5)"
+        line = f"<b>{code}</b> - {name} ({score}/5)"
         insight = zones_insights.get(code)
         if insight:
             line += f"<br/><font size=\"8\">{insight}</font>"
@@ -379,7 +379,7 @@ def generate_flash_pdf(
             "VOTRE STACK IA DECLARE", styles["Section"]
         ))
         story.append(Paragraph(
-            " &#8226; ".join(ia_stack_d),
+            ", ".join(ia_stack_d),
             styles["Body"],
         ))
 
@@ -419,7 +419,7 @@ def generate_flash_pdf(
             story.append(Paragraph(f"<b>{title}</b>", styles["Body"]))
             for d in items:
                 story.append(Paragraph(
-                    f"&#9656; <i>{d}</i>",
+                    f"<i>{d}</i>",
                     styles["Quote"],
                 ))
 
@@ -496,7 +496,7 @@ def generate_flash_pdf(
             ))
             for choice in ms_choices:
                 story.append(Paragraph(
-                    f"&#8226; {choice}",
+                    f"{choice}",
                     styles["Body"],
                 ))
 
