@@ -84,6 +84,16 @@ questions:
   - id: q2
     axis_code: P
     axis_name: "Portefeuille de cas d'usage"
+    text_prompt: "Citez 2 cas d'usage IA dans lesquels vous investissez aujourd'hui."
+    select:
+      label: "Combien de cas d'usage IA avez-vous déjà mis en production ?"
+      required: false
+      options:
+        - "Aucun"
+        - "1 ou 2 POC isolés"
+        - "3 à 5 cas d'usage en production"
+        - "6 à 15 cas d'usage en production"
+        - "Plus de 15 cas d'usage en production, scaling continu"
     multiselect:
       label: "Dans quels domaines souhaiteriez-vous renforcer vos cas d'usage IA ? (optionnel - cochez ce qui s'applique)"
       required: false
@@ -99,7 +109,6 @@ questions:
         - "Productivité supply chain / achats"
         - "Productivité processus coeurs de métier"
         - "Autre (préciser dans la zone de texte ci-dessous)"
-    text_prompt: "Citez 2 cas d'usage IA dans lesquels vous investissez aujourd'hui."
     eval_prompt: "Évaluez votre processus de priorisation des cas d'usage."
     anchors:
       1: "Cas d'usage opportunistes, aucune sélection structurée."
@@ -114,6 +123,7 @@ questions:
     multiselect:
       label: "Quel(s) outil(s) ou stack IA utilisez-vous aujourd'hui ? (cochez tout ce qui s'applique - au moins une réponse)"
       required: true
+      first: true  # rendu AVANT le text_prompt car parle a tout le monde
       options:
         - "Aucun, ou usage individuel non encadré (ChatGPT grand public personnel)"
         - "ChatGPT Enterprise / Team / Plus"

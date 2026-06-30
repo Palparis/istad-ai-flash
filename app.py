@@ -359,7 +359,7 @@ def render_questionnaire(config: dict) -> None:
     st.info(
         "**Lecture des options proposées** : les 5 niveaux affichés sont des "
         "repères illustratifs qui correspondent aux situations les plus "
-        "fréquemment observées en ETI. Si votre situation ne correspond à "
+        "fréquemment observées. Si votre situation ne correspond à "
         "aucune des descriptions exactement, choisissez celle qui s'en "
         "rapproche le plus, ou notez selon votre propre lecture sur "
         "l'échelle (1 = situation très peu avancée ; 5 = situation très "
@@ -381,10 +381,26 @@ def render_questionnaire(config: dict) -> None:
                 else f"### {i}. {q['axis_name']} *(transverse)*"
             )
 
-            # Ordre logique : etat actuel (text libre) -> etat souhaite
-            # (multiselect domaines) -> processus (ancres).
+            # Ordre par defaut : text -> select -> multiselect -> ancres.
+            # Pour les questions ou le multiselect "parle a tout le monde"
+            # (typiquement Q3 sur la stack IA), on peut le forcer en premier
+            # via le flag `first: true` dans le YAML.
+            ms_cfg = q.get("multiselect")
+            ms_first = bool(ms_cfg and ms_cfg.get("first"))
 
-            # Champ texte libre (si défini) - l'etat actuel decrit avec ses mots
+            def _render_multiselect():
+                ms_choices = st.multiselect(
+                    ms_cfg.get("label", "Cochez tout ce qui s'applique"),
+                    options=ms_cfg.get("options", []),
+                    key=f"{qid}_multiselect",
+                )
+                answers[f"{qid}_multiselect"] = ms_choices
+
+            # 1. Multiselect en premier si demande
+            if ms_first:
+                _render_multiselect()
+
+            # 2. Champ texte libre - description en mots
             if q.get("text_prompt"):
                 txt = st.text_area(
                     q["text_prompt"],
@@ -395,16 +411,21 @@ def render_questionnaire(config: dict) -> None:
                 )
                 answers[f"{qid}_text"] = txt or ""
 
-            # Multiselect (si défini) - typiquement Q2 domaines souhaites,
-            # Q3 stack IA effectivement deploye
-            if q.get("multiselect"):
-                ms_cfg = q["multiselect"]
-                ms_choices = st.multiselect(
-                    ms_cfg.get("label", "Cochez tout ce qui s'applique"),
-                    options=ms_cfg.get("options", []),
-                    key=f"{qid}_multiselect",
+            # 3. Select (single-choice) - question quantitative cadree
+            if q.get("select"):
+                sel_cfg = q["select"]
+                sel_choice = st.selectbox(
+                    sel_cfg.get("label", "Choisissez une option"),
+                    options=["(non renseigné)"] + sel_cfg.get("options", []),
+                    key=f"{qid}_select",
+                    index=0,
                 )
-                answers[f"{qid}_multiselect"] = ms_choices
+                if sel_choice != "(non renseigné)":
+                    answers[f"{qid}_select"] = sel_choice
+
+            # 4. Multiselect en position standard (apres text si pas force first)
+            if ms_cfg and not ms_first:
+                _render_multiselect()
 
             # Auto-évaluation 5 ancres (sans afficher le score 1-5)
             #
@@ -440,15 +461,20 @@ def render_questionnaire(config: dict) -> None:
         # Vérifier que toutes les questions scorées sont répondues.
         # Les questions sans ancres (Q9 transverse irritants) n'ont pas
         # besoin d'etre evaluees sur une echelle.
-        missing = [
-            q["id"] for q in questions
+        missing_questions = [
+            q for q in questions
             if q.get("anchors") and q["id"] not in answers
         ]
-        if missing:
+        if missing_questions:
+            labels = [
+                f"**{q['axis_code']} - {q['axis_name']}**"
+                for q in missing_questions
+            ]
             st.error(
-                f"Merci de répondre à toutes les questions ({len(missing)} "
-                f"question{'s' if len(missing) > 1 else ''} restante"
-                f"{'s' if len(missing) > 1 else ''})."
+                f"Merci de répondre à l'échelle de maturité (1-5) pour "
+                f"{len(missing_questions)} "
+                f"question{'s' if len(missing_questions) > 1 else ''} : "
+                f"{', '.join(labels)}."
             )
             return
 

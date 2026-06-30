@@ -27,6 +27,7 @@ class FlashResult:
     axis_names: dict[str, str]  # {axis_code: name}
     text_inputs: dict[str, str]  # {axis_code: phrase libre}
     multiselects: dict[str, list[str]]  # {axis_code: options cochées} - Q3 IA stack notamment
+    selects: dict[str, str]  # {axis_code: option choisie en single-select} - Q2 nb cas d'usage notamment
     chosen_anchors: dict[str, str]  # {axis_code: texte intégral de l'ancre choisie} - pour annexe PDF
     irritants: str  # text_area Q9 transverse - irritants quotidiens du répondant
     global_score: float
@@ -81,6 +82,7 @@ def compute_flash_result(
     axis_names: dict[str, str] = {}
     text_inputs: dict[str, str] = {}
     multiselects: dict[str, list[str]] = {}
+    selects: dict[str, str] = {}
     chosen_anchors: dict[str, str] = {}
     irritants = ""
 
@@ -108,6 +110,9 @@ def compute_flash_result(
             multiselects[axis_code] = [
                 opt for opt in ms_value if isinstance(opt, str) and opt.strip()
             ]
+        sel_value = (answers.get(f"{qid}_select") or "").strip()
+        if sel_value:
+            selects[axis_code] = sel_value
 
     # Score global = moyenne arithmétique des 8 axes
     if axis_scores:
@@ -146,6 +151,7 @@ def compute_flash_result(
         axis_names=axis_names,
         text_inputs=text_inputs,
         multiselects=multiselects,
+        selects=selects,
         chosen_anchors=chosen_anchors,
         irritants=irritants,
         global_score=round(global_score, 2),

@@ -293,6 +293,15 @@ def _build_lead_email_html(
 
     <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
                margin-top: 24px;">
+        Portefeuille de cas d'usage IA (Q2)
+    </h3>
+    <p style="font-size: 14px; margin: 4px 0;">
+        <b>Nombre de cas d'usage en production :</b>
+        {result.selects.get("P", "Non renseigné")}
+    </p>
+
+    <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
+               margin-top: 24px;">
         Stack IA déclaré (Q3 - Données & Technologie)
     </h3>
     <ul style="font-size: 14px;">{ia_stack_html}</ul>

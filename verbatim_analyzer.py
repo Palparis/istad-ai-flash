@@ -173,6 +173,9 @@ def _build_user_prompt(result: FlashResult) -> str:
         else "(non renseigné, le répondant n'a pas indiqué de domaines prioritaires)"
     )
 
+    # Nombre de cas d'usage IA deja en production (select Q2)
+    nb_cas_usage = result.selects.get("P", "(non renseigné)")
+
     # Typologie entreprise (renseignee sur la page d'accueil)
     secteur_label = result.secteur
     if result.secteur == "Autre" and result.secteur_precision:
@@ -187,6 +190,8 @@ Score global : **{result.global_score:.2f} / 5** (niveau {result.level} - {resul
 **Stack IA déclaré sur l'axe D - Données & Technologie** : {ia_stack_str}
 
 **Domaines où le répondant souhaite renforcer ses cas d'usage IA (axe P)** : {domaines_str}
+
+**Nombre de cas d'usage IA déjà en production (axe P)** : {nb_cas_usage}
 
 **Irritants quotidiens déclarés par le répondant** : {result.irritants if result.irritants else "(non renseigné)"}
 
