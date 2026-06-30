@@ -118,28 +118,20 @@ st.markdown("""
         [data-testid="stForm"] { padding: 0.5rem !important; }
         [data-testid="stTextInput"] label,
         [data-testid="stSelectbox"] label { font-size: 0.85rem !important; }
-        /* Carres decoratifs lateraux (aplats charte Istada).
-           Gauche : carre couleur (rouge Istada signature).
-           Droite : carre noir et blanc (diagonale aplats juxtaposes).
-           Attaches a .stApp avec z-index positif + pointer-events:none
-           pour s'afficher au-dessus du fond blanc Streamlit sans bloquer
-           l'interaction utilisateur. */
-        .stApp::before, .stApp::after {
-            content: ""; position: fixed; top: 50%; width: 64px; height: 64px;
-            transform: translateY(-50%); z-index: 1000; opacity: 0.9;
+        /* Cubes lateraux : logos Istada officiels (extraits .ai par PAL).
+           Charges via le composant Streamlit dans render_intro pour eviter
+           la complexite des background-image en CSS (chemin relatif app
+           sur Streamlit Cloud). Voir cube-couleur.png et cube-bw.png. */
+        .istad-cube-left, .istad-cube-right {
+            position: fixed; top: 50%;
+            width: 96px; height: auto;
+            transform: translateY(-50%); z-index: 1000;
             pointer-events: none;
         }
-        .stApp::before {
-            left: 28px;
-            background-color: #E30613;
-        }
-        .stApp::after {
-            right: 28px;
-            background: linear-gradient(135deg, #2D2D2D 50%, #FFFFFF 50%);
-            border: 1px solid #2D2D2D;
-        }
+        .istad-cube-left { left: 24px; }
+        .istad-cube-right { right: 24px; }
         @media (max-width: 1100px) {
-            .stApp::before, .stApp::after { display: none; }
+            .istad-cube-left, .istad-cube-right { display: none; }
         }
     </style>
 """, unsafe_allow_html=True)
@@ -209,10 +201,26 @@ def _scroll_to_top() -> None:
 # ============================================================
 
 def render_intro(config: dict) -> None:
-    # Banniere photo montagne au format hero (970x280, ratio ~3.5:1).
-    # Cadrage qui montre le pic principal + ciel + chaine, et qui tient
-    # dans le viewport sans alourdir la page d'accueil.
     assets = Path(__file__).parent / "assets"
+
+    # Cubes lateraux (logos Istada officiels extraits des .ai).
+    # Encodes en base64 et injectes en HTML inline pour fiabilite max.
+    import base64
+    cubes_html = ""
+    for cls, fname in (("istad-cube-left", "cube-couleur.png"),
+                       ("istad-cube-right", "cube-bw.png")):
+        img_path = assets / fname
+        if img_path.exists():
+            with open(img_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("ascii")
+            cubes_html += (
+                f'<img class="{cls}" '
+                f'src="data:image/png;base64,{b64}" alt="">'
+            )
+    if cubes_html:
+        st.markdown(cubes_html, unsafe_allow_html=True)
+
+    # Banniere photo montagne au format hero (970x180, ratio ~5.4:1).
     for candidate in ("photo-montagne-hero.jpg", "photo-montagne-banner.jpg",
                       "Photo montagne.jpg"):
         photo = assets / candidate
