@@ -43,6 +43,29 @@ roles:
   - "Autre"
 
 # ============================================================
+# Typologie entreprise (questions contextuelles non scorées)
+# ============================================================
+effectifs:
+  - "Moins de 50"
+  - "50 à 250"
+  - "250 à 500"
+  - "500 à 2 000"
+  - "2 000 à 5 000"
+  - "Plus de 5 000"
+
+secteurs:
+  - "Industrie / Manufacturing"
+  - "Services B2B"
+  - "Services B2C"
+  - "Distribution / Retail"
+  - "Santé / Biotech"
+  - "Banque / Finance / Assurance"
+  - "Public / Administration"
+  - "Tech / SaaS"
+  - "Médias / Communication"
+  - "Autre"
+
+# ============================================================
 # Les 10 questions
 # ============================================================
 questions:
@@ -174,15 +197,10 @@ questions:
 
   - id: q9
     axis_code: "TRANSVERSE-1"
-    axis_name: "Maturité globale réelle"
-    text_prompt: null
-    eval_prompt: "Combien de cas d'usage IA sont réellement en production aujourd'hui ?"
-    anchors:
-      1: "Aucun."
-      2: "1 ou 2 POC."
-      3: "3 à 5 cas d'usage en prod."
-      4: "6 à 15 cas d'usage en prod."
-      5: "Plus de 15 cas d'usage en prod, scaling continu."
+    axis_name: "Irritants quotidiens"
+    text_prompt: "En 1 ou 2 phrases : qu'est-ce qui vous coûte du temps au quotidien dans votre fonction, et que l'IA pourrait soulager ?"
+    eval_prompt: null
+    anchors: null
 
   # Q10 : contextualisation (non scorée, géré séparément dans app.py)
 

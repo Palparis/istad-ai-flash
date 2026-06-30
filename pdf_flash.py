@@ -359,21 +359,6 @@ def generate_flash_pdf(
     ]))
     story.append(inner_table)
 
-    # ── Dissonance déclaratif vs réel ──
-    if result.has_dissonance:
-        story.append(Paragraph(
-            "DISSONANCE DÉCLARATIF / RÉEL", styles["Section"]
-        ))
-        story.append(Paragraph(
-            f"Votre maturité <b>déclarée</b> ressort à <b>{result.global_score:.2f}/5</b>, "
-            f"mais le nombre de cas d'usage IA réellement en production correspond à "
-            f"un niveau <b>{result.q9_real_score}/5</b> "
-            f"(écart : <b>{result.dissonance_declaratif_vs_reel:.1f} point</b>). "
-            f"Cet écart est un signal classique d'organisation en phase d'ambition, "
-            f"qu'il convient de transformer en exécution.",
-            styles["Body"],
-        ))
-
     # ── Stack IA déclaré (multiselect Q3) ──
     ia_stack_d = result.multiselects.get("D", [])
     if ia_stack_d:
@@ -529,32 +514,23 @@ def generate_flash_pdf(
             ))
         story.append(Spacer(1, 4))
 
-    # Question transverse Q9
-    story.append(Paragraph(
-        f"<b>Question transverse - Maturité globale réelle</b> &nbsp;|&nbsp; "
-        f"Score déclaré : <b>{result.q9_real_score} / 5</b>",
-        styles["Section"],
-    ))
-    if result.q9_chosen_anchor:
+    # Question transverse Q9 - irritants quotidiens
+    if result.irritants:
         story.append(Paragraph(
-            f"<i>Ancre choisie :</i> {result.q9_chosen_anchor}",
+            "<b>Question transverse - Irritants quotidiens</b>",
+            styles["Section"],
+        ))
+        story.append(Paragraph(
+            f"<i>Réponse libre :</i> &laquo; {result.irritants} &raquo;",
             styles["Body"],
         ))
-    story.append(Spacer(1, 8))
+        story.append(Spacer(1, 8))
 
     # Rappel du score global et du niveau
     story.append(Paragraph(
         f"<b>Score global calculé</b> : moyenne arithmétique des 8 axes = "
         f"<b>{result.global_score:.2f} / 5</b> (niveau {result.level} - "
         f"{result.level_name})",
-        styles["Body"],
-    ))
-    story.append(Paragraph(
-        f"<b>Dissonance déclaratif vs réel</b> : écart de "
-        f"<b>{result.dissonance_declaratif_vs_reel:.2f} point</b> entre "
-        f"maturité moyenne sur les ancres ({result.global_score:.2f}) et "
-        f"maturité réelle déclarée sur la question transverse "
-        f"({result.q9_real_score}).",
         styles["Body"],
     ))
 

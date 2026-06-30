@@ -28,8 +28,7 @@ class FlashResult:
     text_inputs: dict[str, str]  # {axis_code: phrase libre}
     multiselects: dict[str, list[str]]  # {axis_code: options cochées} - Q3 IA stack notamment
     chosen_anchors: dict[str, str]  # {axis_code: texte intégral de l'ancre choisie} - pour annexe PDF
-    q9_real_score: int  # score Q9 transverse (cas d'usage en prod réels)
-    q9_chosen_anchor: str  # texte intégral de l'ancre Q9 choisie
+    irritants: str  # text_area Q9 transverse - irritants quotidiens du répondant
     global_score: float
     level: int
     level_name: str
@@ -37,10 +36,14 @@ class FlashResult:
     level_color: str
     strengths: list[tuple[str, str, int]]  # (axis_code, axis_name, score)
     gaps: list[tuple[str, str, int]]  # (axis_code, axis_name, score), triés croissant
-    dissonance_declaratif_vs_reel: float  # global_score - q9_real_score, en valeur absolue
-    has_dissonance: bool  # True si écart >= 1.0
     role: str
     organization: str
+    effectif: str  # bucket taille effectif (intro page)
+    secteur: str  # secteur entreprise (intro page)
+    secteur_precision: str  # precision si secteur = Autre (intro page)
+    # Champs deprecies (Q9 reconvertie en irritants en juin 2026) :
+    # q9_real_score, q9_chosen_anchor, dissonance_declaratif_vs_reel,
+    # has_dissonance ont ete retires car non pertinents sans Q9 scoree.
 
 
 def load_questions(yaml_path: Path | str | None = None) -> dict:
@@ -79,19 +82,20 @@ def compute_flash_result(
     text_inputs: dict[str, str] = {}
     multiselects: dict[str, list[str]] = {}
     chosen_anchors: dict[str, str] = {}
-    q9_real_score = 3  # fallback
-    q9_chosen_anchor = ""
+    irritants = ""
 
     for q in questions:
         qid = q["id"]
         axis_code = q["axis_code"]
-        score = int(answers.get(qid, 3))
-        anchor_text = q.get("anchors", {}).get(score, "")
+        anchors = q.get("anchors") or {}
 
         if axis_code.startswith("TRANSVERSE"):
-            q9_real_score = score
-            q9_chosen_anchor = anchor_text
+            # Q9 transverse irritants (text_area uniquement, pas de score)
+            irritants = (answers.get(f"{qid}_text") or "").strip()
             continue
+
+        score = int(answers.get(qid, 3))
+        anchor_text = anchors.get(score, "")
 
         axis_scores[axis_code] = score
         axis_names[axis_code] = q["axis_name"]
@@ -137,18 +141,13 @@ def compute_flash_result(
             for code, score in sorted_axes[:3]
         ]
 
-    # Dissonance déclaratif vs réel
-    dissonance = abs(global_score - float(q9_real_score))
-    has_dissonance = dissonance >= 1.0
-
     return FlashResult(
         axis_scores=axis_scores,
         axis_names=axis_names,
         text_inputs=text_inputs,
         multiselects=multiselects,
         chosen_anchors=chosen_anchors,
-        q9_real_score=q9_real_score,
-        q9_chosen_anchor=q9_chosen_anchor,
+        irritants=irritants,
         global_score=round(global_score, 2),
         level=level,
         level_name=level_name,
@@ -156,9 +155,12 @@ def compute_flash_result(
         level_color=level_color,
         strengths=strengths,
         gaps=gaps,
-        dissonance_declaratif_vs_reel=round(dissonance, 2),
-        has_dissonance=has_dissonance,
         role=answers.get("role", "Non renseigné"),
         organization=answers.get("organization", "Votre organisation").strip()
             or "Votre organisation",
+        effectif=(answers.get("effectif") or "Non renseigné").strip()
+            or "Non renseigné",
+        secteur=(answers.get("secteur") or "Non renseigné").strip()
+            or "Non renseigné",
+        secteur_precision=(answers.get("secteur_precision") or "").strip(),
     )

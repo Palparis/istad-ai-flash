@@ -173,13 +173,22 @@ def _build_user_prompt(result: FlashResult) -> str:
         else "(non renseigné, le répondant n'a pas indiqué de domaines prioritaires)"
     )
 
+    # Typologie entreprise (renseignee sur la page d'accueil)
+    secteur_label = result.secteur
+    if result.secteur == "Autre" and result.secteur_precision:
+        secteur_label = f"Autre - {result.secteur_precision}"
+
     return f"""Tu analyses l'audit flash maturité IA de l'organisation **{result.organization}**, répondant en rôle de **{result.role}**.
+
+**Typologie entreprise** : effectif **{result.effectif}**, secteur **{secteur_label}**.
 
 Score global : **{result.global_score:.2f} / 5** (niveau {result.level} - {result.level_name}).
 
 **Stack IA déclaré sur l'axe D - Données & Technologie** : {ia_stack_str}
 
 **Domaines où le répondant souhaite renforcer ses cas d'usage IA (axe P)** : {domaines_str}
+
+**Irritants quotidiens déclarés par le répondant** : {result.irritants if result.irritants else "(non renseigné)"}
 
 L'écran de résultats affiche déjà au répondant :
 - **Vos forces** : {forces_affichees if forces_affichees else "(aucune force notable affichée)"}
@@ -204,7 +213,7 @@ Réponds en JSON strict avec exactement cette structure :
     "<code_axe>": "<1 phrase de 15-25 mots qui pointe la nature du gap et le chantier prioritaire. Si le verbatim est rempli, cite l'élément concret qui révèle le gap. Sinon, ancre sur ce qu'implique un score si bas pour cet axe. Pas de généralité.>"
   }},
 
-  "cas_usage_recommandes": ["<2 à 3 cas d'usage IA concrets, réalistes et ancrés sur LA SITUATION du répondant. Chaque item = 20-40 mots qui DÉCRIT le cas d'usage (pas un titre). FORMAT : 'Domaine : description du cas d'usage avec un effet attendu mesuré'. Critères : (1) ancré sur les domaines déclarés en multiselect Q2 SI rempli, sinon sur les axes les plus bas ; (2) cohérent avec leur stack IA Q3 (ne recommande pas un agent métier complexe à quelqu'un qui n'a même pas ChatGPT Enterprise déployé) ; (3) cohérent avec la taille de leur organisation et leur niveau de maturité actuel ; (4) effet attendu mesuré et qualitatif, jamais 'ROI x3' ou 'gain de 50%'. Exemples de bonne formulation : 'Productivité processus financiers : assistant de rapprochement bancaire et de pré-saisie des notes de frais, gain attendu substantiel sur le temps de clôture mensuelle.' / 'Productivité commerciale : agent de pré-qualification des leads entrants à partir des emails et formulaires web, libérant 30-40% du temps administratif des commerciaux pour la prospection active.' Liste vide [] uniquement si vraiment aucune base sérieuse pour recommander.>"],
+  "cas_usage_recommandes": ["<2 à 3 cas d'usage IA concrets, réalistes et ancrés sur LA SITUATION du répondant. Chaque item = 20-40 mots qui DÉCRIT le cas d'usage (pas un titre). FORMAT : 'Domaine : description du cas d'usage avec un effet attendu mesuré'. Critères : (1) **PRIORITÉ ABSOLUE aux irritants quotidiens déclarés** s'ils sont renseignés - c'est le levier de personnalisation le plus fort ; (2) ancré sur les domaines déclarés en multiselect Q2 ; (3) cohérent avec leur stack IA Q3 (ne recommande pas un agent métier complexe à quelqu'un qui n'a même pas ChatGPT Enterprise déployé) ; (4) cohérent avec la TAILLE et le SECTEUR de leur organisation (un cas d'usage industrie pour une ETI manufacturière, pas pour une ETI services B2B) ; (5) cohérent avec leur niveau de maturité actuel ; (6) effet attendu mesuré et qualitatif, jamais 'ROI x3' ou 'gain de 50%'. Exemples de bonne formulation : 'Productivité processus financiers : assistant de rapprochement bancaire et de pré-saisie des notes de frais, gain attendu substantiel sur le temps de clôture mensuelle.' / 'Productivité commerciale : agent de pré-qualification des leads entrants à partir des emails et formulaires web, libérant 30-40% du temps administratif des commerciaux pour la prospection active.' Liste vide [] uniquement si vraiment aucune base sérieuse pour recommander.>"],
 
   "dissonances_verbatims": ["<TYPE A - liste de 0 à 3 dissonances entre verbatims libres. Format : '<axe X> vs <axe Y> : <explicitation de l'écart en 15-25 mots>'. Liste vide [] si aucune contradiction notable.>"],
 

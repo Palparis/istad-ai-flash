@@ -215,17 +215,14 @@ def _build_lead_email_html(
     else:
         ia_stack_html = "<li><em>Non renseigné</em></li>"
 
-    # Dissonance
-    dissonance_html = ""
-    if result.has_dissonance:
-        dissonance_html = f"""
-        <div style="background: #FFF3E0; padding: 12px; border-left: 4px solid #F57C00;
+    # Irritants quotidiens (Q9 transverse)
+    irritants_html = ""
+    if result.irritants:
+        irritants_html = f"""
+        <div style="background: #F2F4F8; padding: 12px; border-left: 4px solid #6270B4;
                     margin: 12px 0;">
-            <b>⚠️ Dissonance déclaratif / réel :</b><br>
-            Maturité déclarée <b>{result.global_score:.2f}/5</b> vs maturité réelle
-            (cas d'usage en prod) <b>{result.q9_real_score}/5</b> - écart de
-            <b>{result.dissonance_declaratif_vs_reel:.1f} point</b>. Signal classique
-            d'organisation en phase d'ambition à challenger en restitution.
+            <b>Irritants quotidiens déclarés :</b><br>
+            <em>« {result.irritants} »</em>
         </div>
         """
 
@@ -269,7 +266,16 @@ def _build_lead_email_html(
         « {result.level_description} »
     </p>
 
-    {dissonance_html}
+    {irritants_html}
+
+    <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
+               margin-top: 24px;">
+        Typologie entreprise
+    </h3>
+    <p style="font-size: 14px;">
+        <b>Effectif :</b> {result.effectif}<br>
+        <b>Secteur :</b> {result.secteur}{(' (' + result.secteur_precision + ')') if result.secteur_precision else ''}
+    </p>
 
     <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
                margin-top: 24px;">

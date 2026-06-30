@@ -271,17 +271,37 @@ def render_intro(config: dict) -> None:
             st.markdown(full_text)
 
     with st.form("intro_form"):
-        org = st.text_input(
-            "Nom de votre organisation",
-            help="Apparaîtra sur votre rapport. Non collecté côté serveur.",
-            placeholder="ex. ACME, MaSociété, etc.",
+        c1, c2 = st.columns([2, 1])
+        with c1:
+            org = st.text_input(
+                "Nom de votre organisation",
+                placeholder="ex. ACME, MaSociété, etc.",
+            )
+        with c2:
+            role = st.selectbox(
+                "Votre rôle",
+                options=config["roles"],
+                index=0,
+            )
+
+        c3, c4 = st.columns(2)
+        with c3:
+            effectif = st.selectbox(
+                "Effectif de votre organisation",
+                options=config.get("effectifs", []),
+                index=0,
+            )
+        with c4:
+            secteur = st.selectbox(
+                "Secteur d'activité",
+                options=config.get("secteurs", []),
+                index=0,
+            )
+        secteur_precision = st.text_input(
+            "Si 'Autre' ci-dessus, précisez votre secteur",
+            placeholder="(rempli uniquement si vous avez choisi 'Autre')",
         )
-        role = st.selectbox(
-            "Votre rôle",
-            options=config["roles"],
-            index=0,
-            help="Sert uniquement à contextualiser votre rapport - non scoré.",
-        )
+
         consent = st.checkbox(
             "J'ai pris connaissance des modalités ci-dessus et j'accepte de "
             "démarrer l'audit. Je comprends que mes coordonnées "
@@ -302,8 +322,14 @@ def render_intro(config: dict) -> None:
         if not consent:
             st.error("Vous devez cocher la case de consentement pour continuer.")
             return
+        if secteur == "Autre" and not secteur_precision.strip():
+            st.error("Vous avez sélectionné 'Autre' comme secteur, merci de préciser dans le champ ci-dessus.")
+            return
         st.session_state["organization"] = org.strip()
         st.session_state["role"] = role
+        st.session_state["effectif"] = effectif
+        st.session_state["secteur"] = secteur
+        st.session_state["secteur_precision"] = secteur_precision.strip()
         st.session_state["started"] = True
         st.rerun()
 
@@ -353,17 +379,10 @@ def render_questionnaire(config: dict) -> None:
                 else f"### {i}. {q['axis_name']} *(transverse)*"
             )
 
-            # Multiselect (si défini) - typiquement Q3 stack IA
-            if q.get("multiselect"):
-                ms_cfg = q["multiselect"]
-                ms_choices = st.multiselect(
-                    ms_cfg.get("label", "Cochez tout ce qui s'applique"),
-                    options=ms_cfg.get("options", []),
-                    key=f"{qid}_multiselect",
-                )
-                answers[f"{qid}_multiselect"] = ms_choices
+            # Ordre logique : etat actuel (text libre) -> etat souhaite
+            # (multiselect domaines) -> processus (ancres).
 
-            # Champ texte libre (si défini)
+            # Champ texte libre (si défini) - l'etat actuel decrit avec ses mots
             if q.get("text_prompt"):
                 txt = st.text_area(
                     q["text_prompt"],
@@ -374,6 +393,17 @@ def render_questionnaire(config: dict) -> None:
                 )
                 answers[f"{qid}_text"] = txt or ""
 
+            # Multiselect (si défini) - typiquement Q2 domaines souhaites,
+            # Q3 stack IA effectivement deploye
+            if q.get("multiselect"):
+                ms_cfg = q["multiselect"]
+                ms_choices = st.multiselect(
+                    ms_cfg.get("label", "Cochez tout ce qui s'applique"),
+                    options=ms_cfg.get("options", []),
+                    key=f"{qid}_multiselect",
+                )
+                answers[f"{qid}_multiselect"] = ms_choices
+
             # Auto-évaluation 5 ancres (sans afficher le score 1-5)
             #
             # Insight Celia Felipe (25 juin 2026) : afficher le chiffre 1-5 a
@@ -381,18 +411,22 @@ def render_questionnaire(config: dict) -> None:
             # repondant choisit l'option "un peu meilleure" pour ne pas se
             # devaluer). On cache donc le chiffre dans l'affichage tout en
             # gardant le mapping description -> score en backend.
-            sorted_levels = sorted(q["anchors"].keys())
-            anchor_labels = [q["anchors"][level] for level in sorted_levels]
-            anchor_to_score = {q["anchors"][level]: level for level in sorted_levels}
+            #
+            # Q9 transverse (irritants) n'a PAS d'ancres - on saute le radio.
+            anchors_cfg = q.get("anchors")
+            if anchors_cfg and q.get("eval_prompt"):
+                sorted_levels = sorted(anchors_cfg.keys())
+                anchor_labels = [anchors_cfg[level] for level in sorted_levels]
+                anchor_to_score = {anchors_cfg[level]: level for level in sorted_levels}
 
-            choice = st.radio(
-                q["eval_prompt"],
-                options=anchor_labels,
-                index=None,
-                key=f"{qid}_radio",
-            )
-            if choice is not None:
-                answers[qid] = anchor_to_score[choice]
+                choice = st.radio(
+                    q["eval_prompt"],
+                    options=anchor_labels,
+                    index=None,
+                    key=f"{qid}_radio",
+                )
+                if choice is not None:
+                    answers[qid] = anchor_to_score[choice]
 
             st.markdown("---")
 
@@ -401,8 +435,13 @@ def render_questionnaire(config: dict) -> None:
         )
 
     if submitted:
-        # Vérifier que toutes les questions sont répondues
-        missing = [q["id"] for q in questions if q["id"] not in answers]
+        # Vérifier que toutes les questions scorées sont répondues.
+        # Les questions sans ancres (Q9 transverse irritants) n'ont pas
+        # besoin d'etre evaluees sur une echelle.
+        missing = [
+            q["id"] for q in questions
+            if q.get("anchors") and q["id"] not in answers
+        ]
         if missing:
             st.error(
                 f"Merci de répondre à toutes les questions ({len(missing)} "
@@ -430,6 +469,9 @@ def render_questionnaire(config: dict) -> None:
         # Tout est OK : calculer + ranger en session
         answers["role"] = st.session_state["role"]
         answers["organization"] = st.session_state["organization"]
+        answers["effectif"] = st.session_state.get("effectif", "")
+        answers["secteur"] = st.session_state.get("secteur", "")
+        answers["secteur_precision"] = st.session_state.get("secteur_precision", "")
         result = compute_flash_result(config, answers)
         st.session_state["result"] = result
         st.rerun()
@@ -692,18 +734,6 @@ def render_results(config: dict) -> None:
     # ── Radar ──
     st.markdown("### Votre radar 8 axes")
     render_radar_plotly(result)
-
-    # ── Dissonance déclaratif vs réel ──
-    if result.has_dissonance:
-        st.warning(
-            f"**Dissonance détectée** : votre maturité déclarée ressort à "
-            f"**{result.global_score:.2f}/5**, mais le nombre de cas d'usage IA "
-            f"réellement en production correspond à un niveau "
-            f"**{result.q9_real_score}/5** "
-            f"(écart : {result.dissonance_declaratif_vs_reel:.1f} point). "
-            f"Signal classique d'organisation en phase d'ambition, à transformer "
-            f"en exécution."
-        )
 
     # ── Lecture personnalisée Claude (si présente) ──
     analysis = st.session_state.get("verbatim_analysis")
