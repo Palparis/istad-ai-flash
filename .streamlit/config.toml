@@ -1,0 +1,16 @@
+[theme]
+# Palette IstadAi inspiree de la charte Istada
+# Bleu principal Istada (boutons, sliders, accents)
+primaryColor = "#6270B4"
+# Blanc cabinet pour fond principal
+backgroundColor = "#FFFFFF"
+# Gris tres clair pour blocs secondaires (st.info, st.expander, inputs)
+secondaryBackgroundColor = "#F2F4F8"
+# Gris fonce Istada pour le texte
+textColor = "#2D2D2D"
+font = "sans serif"
+
+[server]
+# Reduire les sources externes pour limiter les latences UX
+enableXsrfProtection = true
+enableCORS = true

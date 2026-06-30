@@ -186,8 +186,7 @@ consent_short: |
 # ============================================================
 consent_text: |
   **Scoring.** Vos réponses sont calculées selon une grille d'analyse
-  construite par IstadAi, traçable et reproductible. Pas d'algorithme
-  boîte noire.
+  construite par IstadAi, traçable et reproductible.
 
   **Option d'analyse qualitative par Claude (Anthropic).** Si vous
   l'autorisez explicitement à l'étape suivante, vos verbatims et vos

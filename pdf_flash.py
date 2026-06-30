@@ -40,12 +40,14 @@ from scoring_flash import FlashResult
 from verbatim_analyzer import VerbatimAnalysis
 
 # Couleurs IstadAi
-COLOR_PRIMARY = colors.HexColor("#1F365A")
-COLOR_TEXT = colors.HexColor("#1A1A1A")
-COLOR_MUTED = colors.HexColor("#666666")
-COLOR_BG_LIGHT = colors.HexColor("#F4F6FA")
-COLOR_GREEN = colors.HexColor("#388E3C")
-COLOR_RED = colors.HexColor("#D32F2F")
+# Palette IstadAi inspiree de la charte Istada (bleu marine + gris)
+# Cf. assets/Charte Graphique.pptx pour les valeurs source.
+COLOR_PRIMARY = colors.HexColor("#2E3A66")   # bleu marine Istada
+COLOR_TEXT = colors.HexColor("#2D2D2D")      # gris fonce Istada
+COLOR_MUTED = colors.HexColor("#808080")     # gris moyen Istada
+COLOR_BG_LIGHT = colors.HexColor("#F2F4F8")  # blanc casse
+COLOR_GREEN = colors.HexColor("#388E3C")     # vert semantique forces
+COLOR_RED = colors.HexColor("#D32F2F")       # rouge semantique zones
 
 MOIS_FR = {
     1: "janvier", 2: "février", 3: "mars", 4: "avril",

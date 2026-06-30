@@ -27,7 +27,9 @@ if [ ! -d "$PUBLIC_DIR/.git" ]; then
     git clone https://github.com/Palparis/istad-ai-flash.git "$PUBLIC_DIR"
 fi
 
-# 2. Synchroniser les fichiers (exclusions : .git, caches Python, OS files, sessions)
+# 2. Synchroniser les fichiers (exclusions : .git, caches Python, OS files, sessions,
+#    et fichiers sensibles de la charte Istada qui ne doivent pas etre publies).
+#    On garde uniquement la banniere croppee photo-montagne-banner.jpg dans assets/.
 echo ""
 echo "▸ Synchronisation des fichiers…"
 rsync -av --delete \
@@ -37,6 +39,10 @@ rsync -av --delete \
     --exclude='.DS_Store' \
     --exclude='sessions/' \
     --exclude='.venv/' \
+    --exclude='assets/Photo montagne.jpg' \
+    --exclude='assets/Charte Graphique.pptx' \
+    --exclude='assets/cube_*.png' \
+    --exclude='assets/cubeNB_*.png' \
     "$SRC_DIR/" "$PUBLIC_DIR/"
 
 # 3. Commit + push

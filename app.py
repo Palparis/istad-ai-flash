@@ -54,14 +54,18 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        .main .block-container { padding-top: 2rem; max-width: 800px; }
-        h1 { color: #1F365A; }
-        h2, h3 { color: #1F365A; margin-top: 1.5rem; }
+        .main .block-container { padding-top: 1.2rem; max-width: 820px; }
+        /* Palette IstadAi (charte Istada) :
+           bleu marine #2E3A66 pour titres, bleu #6270B4 pour accents */
+        h1 { color: #2E3A66; font-weight: 700; }
+        h2, h3 { color: #2E3A66; margin-top: 1.5rem; }
         .stRadio label { font-size: 0.95rem; }
         .istad-tagline {
-            color: #666; font-size: 0.85rem;
-            margin-top: -0.5rem; margin-bottom: 2rem;
+            color: #6270B4; font-size: 0.95rem; font-weight: 500;
+            margin-top: -0.5rem; margin-bottom: 1.5rem;
         }
+        /* Image bannière : coins arrondis discrets */
+        .stImage img { border-radius: 6px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -130,6 +134,11 @@ def _scroll_to_top() -> None:
 # ============================================================
 
 def render_intro(config: dict) -> None:
+    # Banniere panoramique montagne (identite IstadAi inspiree Istada)
+    banner_path = Path(__file__).parent / "assets" / "photo-montagne-banner.jpg"
+    if banner_path.exists():
+        st.image(str(banner_path), width="stretch")
+
     st.title("Audit Flash Maturité IA")
     st.markdown(
         '<div class="istad-tagline">Pré-diagnostic IA en 10 questions, '
