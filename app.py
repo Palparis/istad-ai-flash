@@ -54,39 +54,49 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        /* Compactage page d'accueil pour tenir dans le viewport */
+        /* Compactage page d'accueil pour tenir dans le viewport sans scroll */
         .main .block-container {
-            padding-top: 0.6rem;
-            padding-bottom: 1rem;
+            padding-top: 0.3rem !important;
+            padding-bottom: 1rem !important;
             max-width: 820px;
         }
         /* Palette IstadAi (charte Istada) :
            bleu marine #2E3A66 pour titres, bleu #6270B4 pour accents */
         h1 {
-            color: #2E3A66; font-weight: 700;
-            font-size: 1.9rem; margin-top: 0.5rem; margin-bottom: 0.3rem;
+            color: #2E3A66 !important; font-weight: 700;
+            font-size: 1.7rem !important;
+            margin-top: 0.3rem !important; margin-bottom: 0.2rem !important;
+            padding-top: 0 !important;
         }
-        h2 { color: #2E3A66; margin-top: 0.8rem; margin-bottom: 0.4rem; }
-        h3 { color: #2E3A66; margin-top: 0.8rem; margin-bottom: 0.4rem; }
-        p { margin-bottom: 0.4rem; }
+        h2, h3 {
+            color: #2E3A66 !important;
+            margin-top: 0.5rem !important; margin-bottom: 0.3rem !important;
+        }
+        p { margin-bottom: 0.3rem !important; }
+        ul, ol { margin-top: 0.2rem !important; margin-bottom: 0.3rem !important; }
+        li { margin-bottom: 0.1rem !important; }
         .stRadio label { font-size: 0.95rem; }
         .istad-tagline {
-            color: #6270B4; font-size: 0.95rem; font-weight: 500;
-            margin-top: -0.3rem; margin-bottom: 0.8rem;
+            color: #6270B4; font-size: 0.9rem; font-weight: 500;
+            margin-top: -0.4rem; margin-bottom: 0.5rem;
         }
-        /* Image bannière : coins arrondis discrets, taille contrainte */
-        .stImage img {
-            border-radius: 6px;
-            max-height: 220px; width: 100%; object-fit: cover;
-            object-position: center 35%;
+        /* Banniere : coins arrondis discrets */
+        .stImage img { border-radius: 6px; }
+        /* Reduction marges autour des blocs Streamlit */
+        [data-testid="stAlert"] {
+            padding: 0.5rem 0.8rem !important;
+            margin: 0.3rem 0 !important;
         }
-        /* Carres decoratifs lateraux inspires de la charte (aplats sans degrade) */
+        [data-testid="stExpander"] {
+            margin: 0.2rem 0 !important;
+        }
+        /* Carres decoratifs lateraux (aplats sans degrade, conforme charte) */
         body::before, body::after {
-            content: ""; position: fixed; top: 50%; width: 60px; height: 60px;
+            content: ""; position: fixed; top: 50%; width: 56px; height: 56px;
             transform: translateY(-50%); z-index: -1; opacity: 0.85;
         }
-        body::before { left: 28px; background-color: #6270B4; }
-        body::after { right: 28px; background-color: #E30613; }
+        body::before { left: 24px; background-color: #6270B4; }
+        body::after { right: 24px; background-color: #E30613; }
         @media (max-width: 1100px) {
             body::before, body::after { display: none; }
         }
@@ -158,16 +168,16 @@ def _scroll_to_top() -> None:
 # ============================================================
 
 def render_intro(config: dict) -> None:
-    # Banniere photo montagne (identite IstadAi inspiree Istada).
-    # On prefere la photo complete, contrainte en hauteur par le CSS
-    # (.stImage img max-height + object-fit cover) pour tenir dans le
-    # viewport. Fallback sur le crop si la complete n'est pas la.
+    # Banniere photo montagne au format hero (970x280, ratio ~3.5:1).
+    # Cadrage qui montre le pic principal + ciel + chaine, et qui tient
+    # dans le viewport sans alourdir la page d'accueil.
     assets = Path(__file__).parent / "assets"
-    photo = assets / "Photo montagne.jpg"
-    if not photo.exists():
-        photo = assets / "photo-montagne-banner.jpg"
-    if photo.exists():
-        st.image(str(photo), width="stretch")
+    for candidate in ("photo-montagne-hero.jpg", "photo-montagne-banner.jpg",
+                      "Photo montagne.jpg"):
+        photo = assets / candidate
+        if photo.exists():
+            st.image(str(photo), width="stretch")
+            break
 
     st.title("Audit Flash Maturité IA")
     st.markdown(
