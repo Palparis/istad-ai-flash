@@ -681,7 +681,7 @@ def render_results(config: dict) -> None:
 
 **Forces** : axes où vous avez score 4 ou 5 sur 5. Ce sont vos atouts sur lesquels capitaliser.
 
-**Zones de progrès prioritaires** : axes où vous avez score 1 ou 2. Ce sont les leviers à activer en priorité. Une sévérité haute indique un poids fort dans le framework combiné avec un score bas.
+**Opportunités prioritaires** : axes où vous avez score 1 ou 2. Ce sont les leviers à activer en priorité. Une sévérité haute indique un poids fort dans le framework combiné avec un score bas.
 
 **Repère de marché** : selon nos observations, la maturité IA moyenne des ETI françaises se situe entre niveau 2 et 3. Atteindre le niveau 4 demande généralement 18 à 36 mois de transformation structurée.
             """
@@ -708,14 +708,24 @@ def render_results(config: dict) -> None:
     # ── Lecture personnalisée Claude (si présente) ──
     analysis = st.session_state.get("verbatim_analysis")
     if analysis is not None and analysis.commentaire_personnalise:
-        st.markdown("### 🧠 Lecture personnalisée de vos verbatims")
+        st.markdown("### Lecture personnalisée par Claude")
         st.caption(
             "Analyse qualitative produite par Claude (Anthropic) à partir de "
-            f"vos phrases libres. Coût estimé : {analysis.cost_estimate_eur:.4f} EUR. "
+            f"vos réponses. Coût estimé : {analysis.cost_estimate_eur:.4f} EUR. "
             "Anthropic ne réutilise pas les inputs/outputs pour entraîner ses "
             "modèles (politique contractuelle standard)."
         )
         st.info(analysis.commentaire_personnalise)
+
+        # Cas d'usage IA recommandés (basés sur Q2 multiselect domaines + Q3 stack IA)
+        if analysis.cas_usage_recommandes:
+            st.markdown("### Cas d'usage IA recommandés pour votre situation")
+            st.caption(
+                "Suggestions concrètes calibrées sur les domaines que vous avez "
+                "indiqués et votre stack IA déclaré."
+            )
+            for cu in analysis.cas_usage_recommandes:
+                st.success(cu)
 
         # Trois types de dissonances rendus séparément (chacun en expander)
         total_diss = (
@@ -742,7 +752,7 @@ def render_results(config: dict) -> None:
                         st.warning(d)
         st.divider()
 
-    # ── Forces / Zones de progrès ──
+    # ── Forces / Opportunités prioritaires ──
     st.caption(
         "Vos forces sont les axes scorant 4 ou 5 sur 5. Vos zones de progrès sont "
         "les axes scorant 1 ou 2. Si aucun axe n'atteint ces seuils, le radar "
@@ -770,7 +780,7 @@ def render_results(config: dict) -> None:
                 "Aucun axe ne ressort en force marquée - terrain d'opportunité large."
             )
     with c2:
-        st.markdown("### Zones de progrès prioritaires")
+        st.markdown("### Opportunités prioritaires")
         for code, name, score in result.gaps:
             insight = zones_insights.get(code)
             if insight:

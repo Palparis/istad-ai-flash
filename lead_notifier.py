@@ -183,7 +183,7 @@ def _build_lead_email_html(
     else:
         strengths_html = "<li><em>Aucune force marquée - terrain d'opportunité large.</em></li>"
 
-    # Zones de progrès
+    # Opportunités prioritaires
     gaps_html = "".join(
         _li_with_insight(code, name, score, zones_insights.get(code))
         for code, name, score in result.gaps
@@ -282,7 +282,7 @@ def _build_lead_email_html(
     <h3 style="color: #388E3C; margin-top: 24px;">✅ Forces</h3>
     <ul>{strengths_html}</ul>
 
-    <h3 style="color: #D32F2F; margin-top: 16px;">🎯 Zones de progrès prioritaires</h3>
+    <h3 style="color: #D32F2F; margin-top: 16px;">Opportunités prioritaires</h3>
     <ul>{gaps_html}</ul>
 
     <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
@@ -342,13 +342,27 @@ def _build_verbatim_analysis_html(analysis: VerbatimAnalysis | None) -> str:
         )
     )
 
+    # Section cas d'usage recommandés
+    cas_usage_html = ""
+    if analysis.cas_usage_recommandes:
+        lis = "".join(
+            f"<li style='margin-bottom: 6px;'>{cu}</li>"
+            for cu in analysis.cas_usage_recommandes
+        )
+        cas_usage_html = (
+            '<p style="margin-top: 12px;"><b>Cas d\'usage IA recommandés '
+            'pour votre situation</b></p>'
+            f"<ul>{lis}</ul>"
+        )
+
     return f"""
-    <h3 style="color: #1F365A; border-bottom: 1px solid #ddd; padding-bottom: 4px;
+    <h3 style="color: #2E3A66; border-bottom: 1px solid #ddd; padding-bottom: 4px;
                margin-top: 24px;">
         Lecture personnalisée (Claude)
     </h3>
-    <div style="background: #F4F6FA; padding: 12px; border-radius: 6px;">
+    <div style="background: #F2F4F8; padding: 12px; border-radius: 6px;">
         <p>{commentaire_html}</p>
+        {cas_usage_html}
         {diss_html}
         <p style="color: #999; font-size: 11px; margin-top: 8px;">
             Coût estimé de l'analyse : {analysis.cost_estimate_eur:.4f} EUR.

@@ -61,12 +61,17 @@ class VerbatimAnalysis:
     - dissonances_verbatim_vs_ancre : entre un verbatim et l'ancre choisie
     - dissonances_ancres : entre les ancres choisies (cross-axes)
 
-    Enrichissement des cartouches forces / zones de progrès :
+    Enrichissement des cartouches forces / opportunités prioritaires :
     - forces_insights : pour chaque axe-force (code), une phrase courte
       qui qualifie la nature du point d'appui, basée sur le verbatim
       quand il est rempli.
-    - zones_insights : pour chaque axe-gap (code), une phrase courte
+    - zones_insights : pour chaque axe-opportunité (code), une phrase courte
       qui pointe le chantier prioritaire et sa nature.
+
+    Cas d'usage recommandés :
+    - cas_usage_recommandes : 2-3 cas d'usage IA concrets et réalistes
+      pour l'organisation, ancrés sur les domaines déclarés en Q2
+      (multiselect domaines) et le stack IA Q3.
     """
     commentaire_personnalise: str
     dissonances_verbatims: list[str]
@@ -74,6 +79,7 @@ class VerbatimAnalysis:
     dissonances_ancres: list[str]
     forces_insights: dict[str, str]
     zones_insights: dict[str, str]
+    cas_usage_recommandes: list[str]
     cost_estimate_eur: float
 
     @property
@@ -96,8 +102,20 @@ Ton style rédactionnel obligatoire :
 - Vocabulaire de cabinet senior : "trajectoire", "périmètre", "défendabilité", "gouvernance", "alignement", "calibration"
 - Phrases structurées : 2 à 4 propositions par phrase
 - Pas de "je", pas de "nous", pas de formules conversationnelles
-- Pas de superlatifs marketing. Préférer "significatif", "notable", "substantiel"
 - Pas de promesses commerciales fantaisistes
+
+INTERDICTIONS STRICTES (ton bullshit commercial à éviter) :
+- Superlatifs marketing : "révolutionnaire", "transformationnel", "extraordinaire", "exceptionnel", "sans précédent", "breakthrough", "game-changer"
+- Promesses chiffrées sans base factuelle : "ROI x3", "gains de 50%", "double la productivité"
+- Formules creuses de consulting : "synergies", "leveraged", "accélérer", "disrupter", "scaler"
+- Ton vendeur : "tout est possible", "potentiel immense", "rêvez plus grand"
+- Verbes de promesse : "va révolutionner", "transformera radicalement"
+
+Tu utilises plutôt :
+- Estimations qualitatives mesurées : "substantiel", "notable", "tangible", "significatif"
+- Actions concrètes formulées comme des prochains pas opérationnels
+- Cas d'usage transformateurs RÉALISTES ancrés sur la taille et le contexte du répondant (pas de transformation magique)
+- Ton motivant mais FACTUEL : on montre ce qui est possible sans en faire trop
 
 Tu détectes TROIS types de dissonances narratives, qui sont la signature analytique d'IstadAi :
 
@@ -148,15 +166,24 @@ def _build_user_prompt(result: FlashResult) -> str:
         else "(non renseigné)"
     )
 
+    # Domaines où le répondant souhaite renforcer ses cas d'usage (multiselect Q2)
+    domaines_p = result.multiselects.get("P", [])
+    domaines_str = (
+        ", ".join(domaines_p) if domaines_p
+        else "(non renseigné, le répondant n'a pas indiqué de domaines prioritaires)"
+    )
+
     return f"""Tu analyses l'audit flash maturité IA de l'organisation **{result.organization}**, répondant en rôle de **{result.role}**.
 
 Score global : **{result.global_score:.2f} / 5** (niveau {result.level} - {result.level_name}).
 
 **Stack IA déclaré sur l'axe D - Données & Technologie** : {ia_stack_str}
 
+**Domaines où le répondant souhaite renforcer ses cas d'usage IA (axe P)** : {domaines_str}
+
 L'écran de résultats affiche déjà au répondant :
 - **Vos forces** : {forces_affichees if forces_affichees else "(aucune force notable affichée)"}
-- **Zones de progrès prioritaires** : {zones_affichees if zones_affichees else "(aucun gap explicite affiché)"}
+- **Opportunités prioritaires** : {zones_affichees if zones_affichees else "(aucun gap explicite affiché)"}
 
 Voici les 8 axes avec le score choisi et le verbatim libre du répondant :
 
@@ -167,7 +194,7 @@ Voici les 8 axes avec le score choisi et le verbatim libre du répondant :
 Réponds en JSON strict avec exactement cette structure :
 
 {{
-  "commentaire_personnalise": "<2 paragraphes courts (2-3 phrases chacun, environ 250-350 mots au total). Paragraphe 1 : ce que le profil global révèle (forces et zones de progrès) sur la maturité IA de l'organisation. **Tu dois explicitement nommer les axes 'forces' et 'zones de progrès' listés ci-dessus** pour rester cohérent avec ce que voit le répondant à l'écran. Tu peux nuancer ou enrichir avec les verbatims, mais sans contredire la liste. Paragraphe 2 : 1-2 actions concrètes que cette organisation pourrait engager dans les 90 jours, ancrées sur les zones de progrès identifiées. Ton senior cabinet, impersonnel, sans formules marketing.>",
+  "commentaire_personnalise": "<2 paragraphes courts (2-3 phrases chacun, environ 250-350 mots au total). Paragraphe 1 : ce que le profil global révèle (forces et opportunités prioritaires) sur la maturité IA de l'organisation. **Tu dois explicitement nommer les axes 'forces' et 'opportunités prioritaires' listés ci-dessus** pour rester cohérent avec ce que voit le répondant à l'écran. Tu peux nuancer ou enrichir avec les verbatims, mais sans contredire la liste. Paragraphe 2 : 1-2 actions concrètes que cette organisation pourrait engager dans les 90 jours, ancrées sur les opportunités identifiées. Ton FACTUEL et mesuré, pas vendeur. Pas de promesse magique, pas de superlatif. Le répondant doit se reconnaître et trouver les pistes pertinentes, pas se sentir flatté.>",
 
   "forces_insights": {{
     "<code_axe>": "<1 phrase de 15-25 mots qui qualifie en quoi cet axe constitue un point d'appui concret pour CETTE organisation. Si le verbatim de l'axe est rempli, ancre l'insight dessus. Sinon, base-toi sur le score et le contexte global. Pas de généralité, pas de promesse marketing.>"
@@ -177,6 +204,8 @@ Réponds en JSON strict avec exactement cette structure :
     "<code_axe>": "<1 phrase de 15-25 mots qui pointe la nature du gap et le chantier prioritaire. Si le verbatim est rempli, cite l'élément concret qui révèle le gap. Sinon, ancre sur ce qu'implique un score si bas pour cet axe. Pas de généralité.>"
   }},
 
+  "cas_usage_recommandes": ["<2 à 3 cas d'usage IA concrets, réalistes et ancrés sur LA SITUATION du répondant. Chaque item = 20-40 mots qui DÉCRIT le cas d'usage (pas un titre). FORMAT : 'Domaine : description du cas d'usage avec un effet attendu mesuré'. Critères : (1) ancré sur les domaines déclarés en multiselect Q2 SI rempli, sinon sur les axes les plus bas ; (2) cohérent avec leur stack IA Q3 (ne recommande pas un agent métier complexe à quelqu'un qui n'a même pas ChatGPT Enterprise déployé) ; (3) cohérent avec la taille de leur organisation et leur niveau de maturité actuel ; (4) effet attendu mesuré et qualitatif, jamais 'ROI x3' ou 'gain de 50%'. Exemples de bonne formulation : 'Productivité processus financiers : assistant de rapprochement bancaire et de pré-saisie des notes de frais, gain attendu substantiel sur le temps de clôture mensuelle.' / 'Productivité commerciale : agent de pré-qualification des leads entrants à partir des emails et formulaires web, libérant 30-40% du temps administratif des commerciaux pour la prospection active.' Liste vide [] uniquement si vraiment aucune base sérieuse pour recommander.>"],
+
   "dissonances_verbatims": ["<TYPE A - liste de 0 à 3 dissonances entre verbatims libres. Format : '<axe X> vs <axe Y> : <explicitation de l'écart en 15-25 mots>'. Liste vide [] si aucune contradiction notable.>"],
 
   "dissonances_verbatim_vs_ancre": ["<TYPE B - liste de 0 à 4 dissonances entre verbatims libres et ancres choisies. Format : 'Axe X : verbatim dit <X> mais ancre choisie correspond à <Y>'. Liste vide [] si aucune dissonance notable.>"],
@@ -185,13 +214,13 @@ Réponds en JSON strict avec exactement cette structure :
 }}
 
 Pour les insights forces et zones_progres :
-- Tu dois fournir UNE insight pour CHAQUE code d'axe listé respectivement dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus.
+- Tu dois fournir UNE insight pour CHAQUE code d'axe listé respectivement dans 'Vos forces' et 'Opportunités prioritaires' ci-dessus.
 - Utilise le code court (V, P, D, O, T, A, M, G) comme clé du dict.
 - Si la liste 'Vos forces' est vide, retourne un objet vide {{}} pour forces_insights.
-- **Cas spécial axe D** : si D apparaît dans les forces ou les zones de progrès, l'insight DOIT citer le stack IA déclaré (ex : 'ChatGPT Enterprise déployé sans agent métier en production' ou 'Aucun LLM, ChatGPT grand public en usage personnel'). Ne reste pas générique sur la data quand le stack IA est connu.
+- **Cas spécial axe D** : si D apparaît dans les forces ou les opportunités, l'insight DOIT citer le stack IA déclaré (ex : 'ChatGPT Enterprise déployé sans agent métier en production' ou 'Aucun LLM, ChatGPT grand public en usage personnel'). Ne reste pas générique sur la data quand le stack IA est connu.
 
 Contraintes critiques :
-- **Cohérence visuelle** : le commentaire doit citer les axes listés dans 'Vos forces' et 'Zones de progrès prioritaires' ci-dessus, pas en désigner d'autres. Le répondant ne doit pas avoir l'impression que le commentaire parle d'un autre audit que celui qu'il voit à l'écran.
+- **Cohérence visuelle** : le commentaire doit citer les axes listés dans 'Vos forces' et 'Opportunités prioritaires' ci-dessus, pas en désigner d'autres. Le répondant ne doit pas avoir l'impression que le commentaire parle d'un autre audit que celui qu'il voit à l'écran.
 - N'utilise QUE des informations présentes dans les verbatims libres, les scores et le stack IA déclaré. Ne déduis pas d'éléments génériques sans base dans les données.
 - Si un axe a un verbatim "(non rempli)", ne mentionne pas son verbatim mais base-toi sur le score, l'ancre choisie et le stack IA déclaré.
 - **Cas sans aucun verbatim libre** : le commentaire personnalisé reste possible et précieux à partir des scores, des ancres et du stack IA. Les dissonances Type A (entre verbatims) et Type B (verbatim vs ancre) seront vides dans ce cas, mais Type C (entre ancres) doit toujours être instruit.
@@ -294,6 +323,7 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
 
         forces_ins = _coerce_str_dict(parsed.get("forces_insights"))
         zones_ins = _coerce_str_dict(parsed.get("zones_progres_insights"))
+        cas_usage = _coerce_str_list(parsed.get("cas_usage_recommandes"))
 
         if not commentaire:
             logger.warning(
@@ -310,6 +340,7 @@ def analyze_verbatims(result: FlashResult) -> VerbatimAnalysis | None:
             dissonances_ancres=diss_ancres,
             forces_insights=forces_ins,
             zones_insights=zones_ins,
+            cas_usage_recommandes=cas_usage,
             cost_estimate_eur=cost_eur,
         )
 

@@ -275,8 +275,8 @@ def _build_strengths_gaps_table(
             styles["Body"],
         )])
 
-    # Bloc Zones de progrès
-    rows.append([Paragraph("<b>Zones de progrès prioritaires</b>", styles["Section"])])
+    # Bloc Opportunités prioritaires
+    rows.append([Paragraph("<b>Opportunités prioritaires</b>", styles["Section"])])
     for code, name, score in result.gaps:
         line = f"<b>{code}</b> - {name} ({score}/5)"
         insight = zones_insights.get(code)
@@ -403,7 +403,7 @@ def generate_flash_pdf(
     if verbatim_analysis is not None and verbatim_analysis.commentaire_personnalise:
         story.append(Spacer(1, 4))
         story.append(Paragraph(
-            "LECTURE PERSONNALISEE DE VOS VERBATIMS",
+            "LECTURE PERSONNALISEE PAR CLAUDE",
             styles["Section"],
         ))
         # Le commentaire LLM peut contenir des sauts de ligne entre paragraphes.
@@ -412,6 +412,19 @@ def generate_flash_pdf(
             "\n\n", "<br/><br/>"
         ).replace("\n", "<br/>")
         story.append(Paragraph(commentaire_html, styles["Body"]))
+
+        # Cas d'usage IA recommandés
+        if verbatim_analysis.cas_usage_recommandes:
+            story.append(Spacer(1, 4))
+            story.append(Paragraph(
+                "CAS D'USAGE IA RECOMMANDES POUR VOTRE SITUATION",
+                styles["Section"],
+            ))
+            for cu in verbatim_analysis.cas_usage_recommandes:
+                story.append(Paragraph(
+                    f"&#8226; {cu}",
+                    styles["Body"],
+                ))
 
         # Trois types de dissonances rendus séparément pour clarté
         def _append_dissonance_block(title: str, items: list[str]):

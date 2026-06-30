@@ -61,6 +61,21 @@ questions:
   - id: q2
     axis_code: P
     axis_name: "Portefeuille de cas d'usage"
+    multiselect:
+      label: "Dans quels domaines souhaiteriez-vous renforcer vos cas d'usage IA ? (optionnel - cochez ce qui s'applique)"
+      required: false
+      options:
+        - "Productivité bureautique"
+        - "Productivité développeurs"
+        - "Productivité support"
+        - "Productivité commerciale"
+        - "Productivité marketing & communication"
+        - "Productivité processus financiers"
+        - "Productivité processus RH"
+        - "Productivité industrielle / production"
+        - "Productivité supply chain / achats"
+        - "Productivité processus coeurs de métier"
+        - "Autre (préciser dans la zone de texte ci-dessous)"
     text_prompt: "Citez 2 cas d'usage IA dans lesquels vous investissez aujourd'hui."
     eval_prompt: "Évaluez votre processus de priorisation des cas d'usage."
     anchors:
