@@ -113,22 +113,28 @@ def _scroll_to_top() -> None:
 def render_intro(config: dict) -> None:
     st.title("🎯 Audit Flash Maturité IA")
     st.markdown(
-        '<div class="istad-tagline">Un pré-diagnostic en 10 questions - '
-        "5 à 10 minutes - proposé par IstadAi.</div>",
+        '<div class="istad-tagline">Pré-diagnostic IA en 10 questions, '
+        "5 à 10 minutes. Par IstadAi.</div>",
         unsafe_allow_html=True,
     )
 
     st.markdown("### Ce que vous allez recevoir")
     st.markdown(
-        "- Un **score global** sur 5 et votre **niveau de maturité** (1 à 5)\n"
-        "- Un **radar 8 axes** : Vision, Portefeuille, Données, Organisation, "
-        "Talent, Adoption, ROI, Gouvernance\n"
-        "- Vos **forces** et vos **zones de progrès prioritaires**\n"
-        "- Un **PDF de synthèse** d'une page, téléchargeable, à partager en interne"
+        "- Votre **score global** sur 5 et votre **niveau de maturité** "
+        "(Initial à Optimized)\n"
+        "- Un **radar 8 axes** couvrant stratégie, exécution et gouvernance\n"
+        "- Vos **forces** et vos **zones de progrès**, axe par axe\n"
+        "- Un **PDF de synthèse** à partager en COMEX"
     )
 
     st.markdown("### Avant de démarrer")
-    st.info(config["consent_text"])
+    short_text = config.get("consent_short", "")
+    full_text = config.get("consent_text", "")
+    if short_text:
+        st.info(short_text)
+    if full_text:
+        with st.expander("Tout savoir avant de commencer (RGPD, analyse Claude, BYOLLM)"):
+            st.markdown(full_text)
 
     with st.form("intro_form"):
         org = st.text_input(
@@ -143,10 +149,10 @@ def render_intro(config: dict) -> None:
             help="Sert uniquement à contextualiser votre rapport - non scoré.",
         )
         consent = st.checkbox(
-            "Je comprends que cet audit est gratuit, qu'il restitue un scoring "
-            "déterministe selon la méthodologie IstadAi, qu'il me sera demandé "
-            "mes coordonnées professionnelles pour accéder à ma synthèse, et "
-            "qu'il ne se substitue pas à un audit professionnel motivé.",
+            "J'ai pris connaissance des modalités ci-dessus et j'accepte de "
+            "démarrer l'audit. Je comprends que mes coordonnées "
+            "professionnelles me seront demandées en fin de questionnaire "
+            "pour accéder à ma synthèse.",
             value=False,
         )
         submitted = st.form_submit_button(

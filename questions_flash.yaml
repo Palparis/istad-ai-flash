@@ -172,53 +172,55 @@ questions:
   # Q10 : contextualisation (non scorée, géré séparément dans app.py)
 
 # ============================================================
-# Texte de consentement (affiché avant de démarrer)
+# Texte de consentement court (affiché par défaut)
+# ============================================================
+consent_short: |
+  Cet audit est **gratuit**. Le scoring est **déterministe** : à réponses
+  identiques, conclusions identiques.
+
+  À la fin du questionnaire, vos coordonnées vous seront demandées pour
+  accéder à votre synthèse. Elles sont conservées **12 mois maximum** et
+  **jamais partagées** avec un tiers.
+
+  Une analyse qualitative par **Claude (Anthropic)** est proposée en option,
+  **désactivable à tout moment**. Elle ne nourrit pas l'entraînement des
+  modèles.
+
+# ============================================================
+# Texte de consentement long (déplié dans un expander)
 # ============================================================
 consent_text: |
-  Cet audit flash est un pré-diagnostic gratuit proposé par **IstadAi**.
+  **Scoring.** Vos réponses sont calculées selon une grille d'analyse
+  construite par IstadAi, traçable et reproductible. Pas d'algorithme
+  boîte noire.
 
-  **Le scoring est 100 % déterministe.** Vos réponses au questionnaire
-  sont calculées selon notre **méthodologie cabinet propriétaire** - un
-  scoring traçable, à scores identiques conclusions identiques.
+  **Option d'analyse qualitative par Claude (Anthropic).** Si vous
+  l'autorisez explicitement à l'étape suivante, vos verbatims et vos
+  scores sont analysés par Claude pour produire un commentaire
+  personnalisé et détecter trois types de dissonances narratives (entre
+  verbatims, entre verbatim et option choisie, entre scores d'axes).
 
-  **Option d'analyse qualitative par Claude (Anthropic)** : si vous
-  l'autorisez explicitement (case à cocher à l'étape suivante), vos
-  phrases libres et vos scores pourront être analysés par Claude pour
-  produire un commentaire personnalisé et identifier 3 types de
-  dissonances narratives (entre verbatims, entre verbatim et option
-  choisie, entre scores d'axes).
+  **Garanties contractuelles Anthropic.** Anthropic agit en tant que
+  sous-traitant. Les données envoyées via leur API ne sont pas utilisées
+  pour entraîner les modèles, ne sont pas revendues à des tiers, et sont
+  supprimées sous 30 jours (politique commerciale standard documentée
+  sur anthropic.com/legal/commercial-terms).
 
-  **Garanties Anthropic** : Anthropic agit en tant que sous-traitant.
-  Les données envoyées via l'API Anthropic **ne sont pas utilisées pour
-  entraîner les modèles**, ne sont **pas revendues à des tiers**, et sont
-  **supprimées sous 30 jours** (politique contractuelle standard
-  documentée sur anthropic.com/legal/commercial-terms). C'est une
-  différence majeure vs les modèles grand public qui réutilisent par
-  défaut les conversations. Cette option est désactivable à tout moment.
+  **Vos coordonnées.** Collectées en fin d'audit par IstadAi (responsable
+  du traitement), conservées 12 mois maximum, jamais partagées avec un
+  tiers. Suppression à tout moment sur demande à
+  pierre-alain.laval@istada.fr.
 
-  À l'issue du questionnaire, vous serez invité(e) à indiquer vos **coordonnées
-  professionnelles** (nom, email, téléphone) pour accéder à votre synthèse et
-  permettre à IstadAi de vous recontacter. Ces données sont collectées par
-  IstadAi (responsable du traitement), conservées **12 mois maximum**, et
-  ne sont **jamais partagées avec un tiers**. Vous pouvez à tout moment
-  demander leur suppression par email à pierre-alain.laval@istada.fr.
-
-  **Architecture IA selon le périmètre.**
-
-  Dans cet **audit flash** : l'analyse qualitative optionnelle (si vous y
-  consentez à l'étape suivante) passe par notre propre clé API Anthropic,
-  avec les garanties listées ci-dessus (pas d'entraînement, pas de revente,
-  suppression sous 30 jours).
-
-  Dans l'**audit complet** d'IstadAi (entretiens multi-sponsors, analyses
-  augmentées par l'IA, détection automatique des dissonances, narration des
-  livrables COMEX) : l'IA est opérée via **l'instance IA de votre
-  organisation** (architecture **BYOLLM**, *Bring Your Own LLM*) pour garantir
-  souveraineté et conformité de bout en bout. IstadAi ne dispose à aucun
-  moment de vos données qualitatives dans ce périmètre.
+  **Architecture IA selon le périmètre.** Dans cet audit flash,
+  l'analyse Claude (optionnelle) passe par notre propre clé API Anthropic
+  avec les garanties ci-dessus. Dans l'audit complet d'IstadAi
+  (entretiens multi-sponsors, analyses augmentées, narration COMEX),
+  l'IA est opérée via l'instance IA de votre organisation (architecture
+  **BYOLLM**, *Bring Your Own LLM*) pour garantir souveraineté et
+  conformité.
 
   Le résultat affiché est indicatif et ne se substitue pas à un audit
-  complet, qui reste l'expression d'un avis professionnel motivé.
+  professionnel.
 
 # ============================================================
 # CTA final (vers commercial)
